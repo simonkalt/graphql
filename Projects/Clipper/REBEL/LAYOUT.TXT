@@ -1,0 +1,61 @@
+REBEL LAYOUT AS OF 12/20/95
+
+
+  MCUST[1]='Bindley Western'
+      MBWITEMNO
+      MBWQTYAVAIL
+      MBWPRICE
+      MBWCASEPACK
+      MBWTRANSMIT
+  MCUST[2]='Foxmeyer'
+      MFITEMNO
+      MFQTYAVAIL
+      MFPRICE
+      MFCASEPACK
+      MFTRANSMIT
+  MCUST[3]='Drug Guild'
+      MTITEMNO
+      MTQTYAVAIL
+      MTPRICE
+      MTCASEPACK
+      MTTRANSMIT
+  MCUST[4]='Walker Drug'
+      MWITEMNO
+      MWQTYAVAIL
+      MWPRICE
+      MWCASEPACK
+      MWTRANSMIT
+  MCUST[5]='Neuman Wholesale'
+      MNITEMNO
+      MNQTYAVAIL
+      MNPRICE
+      MNCASEPACK
+      MNTRANSMIT
+  MCUST[6]='Bergen-Brunswig'
+      MBITEMNO
+      MBQTYAVAIL
+      MBPRICE
+      MBCASEPACK
+      MBMINORDER
+      MBTRANSMIT
+  MCUST[7]='J.E. Goolde'
+      MJITEMNO
+      MJQTYAVAIL
+      MJPRICE
+      MJCASEPACK
+      MJTRANSMIT
+  MCUST[8]='Barnes Wholesale'
+      MBRITEMNO
+      MBRQTYAVAIL
+      MBRPRICE
+      MBRCASEPACK
+      MBRTRANSMIT
+  MCUST[9]='Bellco Drug'
+      MBEITEMNO
+      MBEQTYAVAIL
+      MBEPRICE
+      MBECASEPACK
+      MBETRANSMIT
+
+
+

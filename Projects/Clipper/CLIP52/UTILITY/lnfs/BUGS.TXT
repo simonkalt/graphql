@@ -1,0 +1,54 @@
+This is a list of bugs reported by users, or me of course.
+
+         Date: 30th Jan 97
+         User: ME
+DBLFN Version: 0.01
+      Problem: The automatic alias name does not work when there are
+               spaces in the filename.
+    Diagnosis: The routine needs to be ameneded to replace spaces with
+               underscores.
+
+         Date: 1st Feb 97
+         User: Dave Pearson
+DBLFN Version: 0.01
+      Problem: All database functions (and FILE function) truncate the
+               name portion of filename to 16 characters.
+    Diagnosis: Clipper developers weren't aticipating LFNs.
+       Status: Some work needs to be done on a significant amount of
+               internal routines to fix this.
+
+         Date: 7th Feb 97
+         User: Maurice Uijlenbroek
+DBLFN Version: 0.03
+      Problem: When using Exospace 1.0g, DBLFN doesn't function.
+    Diagnosis: Exospace does not provide interrupt call support for the
+               new calls that DOS applications use for retrieving LFNs.
+       Status: Workaround may be possible with special DPMI calls using
+               the Exospace API.
+
+         Date: 7th Feb 97
+         User: ME
+DBLFN Version: 0.04
+      Problem: Index tags (NTX at least) only use 10 characters of filename
+    Diagnosis: Name truncated
+       Status: Workaround possible, but is it needed?
+
+         Date: 7th Feb 97
+         User: ME
+DBLFN Version: 0.04
+      Problem: INDEX ON command does an uppercase on the target filename
+       Status: Need to locate and remove offending call
+
+         Date: 11th Feb 97
+         User: ME
+DBLFN Version: 0.04
+      Problem: The Directory() function would not pick up a volume label
+               if the "V" attribute was specified.
+       Status: Fixed for 0.05
+
+         Date: 11th Feb 97
+         User: ME
+DBLFN Version: 0.04
+      Problem: The Directory() would usually fail on in normal 8.3 mode
+               because the return code was being ignored.
+       Status: Fixed for 0.05

@@ -1,0 +1,393 @@
+#include "extend.api"
+#include "filesys.api"
+#include "error.api"
+#include "fm.api"
+
+// Don't include ITEM.API as it's definition of ITEM is
+// not very good and we prefer to do it ourselves. ;-)
+
+/* Use /DDGROUP if you are compiling with standard data segments.
+   This means that external Clipper variables can be used as a
+   two byte offset rather than a 4 byte address.  Which also means
+   that there isn't a 2 byte penalty in DGROUP:CONST for using them */
+
+#ifdef DGROUP
+   #define __dgroup  near
+#else
+   #define __dgroup  far            // The far is for watcom which appears to assume near things for external vars
+#endif
+
+
+/* ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+   ³ Raw ITEM value types ³
+   ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ */
+
+#define VALUE_ARRAY        0x8000
+#define VALUE_OBJECT       0x8000                  /* Use _VDict to see if it's an object */
+#define VALUE_FAR_REF      0x4000
+#define VALUE_NEAR_REF     0x2000                  /* When Clipper variables are passed by reference */
+#define VALUE_REF          (VALUE_FAR_REF | VALUE_NEAR_REF)
+#define VALUE_BLOCK        0x1000
+#define VALUE_MEMO         0x0C00
+#define VALUE_CHARACTER    0x0400
+#define VALUE_SYMBOL       0x0100                  /* ??? */
+#define VALUE_LOGICAL      0x0080
+#define VALUE_LOGIC        0x0080
+#define VALUE_DATE         0x0020                  /* Held as a long */
+#define VALUE_DOUBLE       0x0008                  /* Real double number of 8 bytes */
+#define VALUE_INT          0x0002                  /* long. (-32748 -> +32748) */
+#define VALUE_UNSIGNED     0x0002
+#define VALUE_WORD         0x0001                  /* unsigned.  This isn't converted with _tcvt or _dbgValToStr */
+#define VALUE_NUMBER       (VALUE_DOUBLE | VALUE_INT | VALUE_WORD)     /* All Numerics */
+#define VALUE_NIL          0x0000
+#define VALUE_UNDEFINED    0x0000
+
+/*ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+  ³ File attributes ³
+  ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ */
+#define FILE_ARCHIVE          0x0020
+#define FILE_DIRECTORY        0x0010
+#define FILE_VOLUME           0x0008
+#define FILE_SYSTEM           0x0004
+#define FILE_HIDDEN           0x0002
+#define FILE_READONLY         0x0001
+
+// Types
+typedef struct _OSEG {
+   USHORT usSel,
+          usSize,
+          usLocks;
+} OSEG, * OSEGP;
+
+typedef struct _SYMBOL SYMBOL, * SYMBOLP;
+
+typedef struct _SYMTABLE {
+   char     cName[11];
+   char     cType;
+   SYMBOLP  SymList;
+} SYMTABLE, * SYMTABLEP;
+
+typedef struct _SYMBOL {
+   void *      f;
+   unsigned    m;
+   unsigned    alias;
+   SYMTABLEP   SymbolTable;
+   char *      cCode;
+} SYMBOL, * SYMBOLP;
+
+typedef struct __SYMP {
+   SYMTABLEP   TableStart;
+   USHORT      SymbolCount;
+   USHORT      xDunno;
+} _SYMP, * _PSYMP;
+
+typedef unsigned        VMHANDLE;                                  /* de-referenced handle */
+typedef OSEGP VMHANDLE32;
+
+typedef struct {
+   unsigned          nType;
+   unsigned          nLen;
+   unsigned          nDec;
+
+   union {
+      int            nInt;
+      short          nShort;
+      unsigned       nWord;
+      long           nLong;
+      unsigned long  nDWord;
+      double         nDouble;
+      long           nDate;
+      int            lBool;
+      void __far *   lpORef;
+      VMHANDLE32     hHandle;
+
+      struct {
+         unsigned    nOffset;
+         SYMBOLP     lpSymTable;
+      } symtable;
+   } value;
+} VALUE;
+typedef VALUE * VALUEP;
+typedef VALUE far * FPVALUE;
+
+typedef VALUE near * ITEM;
+typedef VALUE * ITEMP;
+
+/* ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+   ³ REGS for _dosfunc ³
+   ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ */
+typedef struct {
+   unsigned ax;
+   unsigned bx;
+   unsigned cx;
+   unsigned dx;
+   unsigned si;
+   unsigned di;
+   unsigned cflag;
+} WORDREGS;
+typedef WORDREGS * WORDREGSP;
+
+typedef struct {
+   char al, ah;
+   char bl, bh;
+   char cl, ch;
+   char dl, dh;
+} BYTEREGS;
+typedef BYTEREGS * BYTEREGSP;
+
+typedef union {
+   WORDREGS x;
+   BYTEREGS h;
+} REGS;
+typedef REGS * REGSP;
+
+/* ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+   ³ Time structure for _ostime ³
+   ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ */
+typedef struct {
+   USHORT nHour,
+          nMinute,
+          nSecond,
+          nHSecond;
+} OSTIME, * OSTIMEP;
+
+/* ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+   ³ For use with _f_first & _f_next ³
+   ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+   ³ DS is not critical unless beta version of Clipper with Stack Checking ³
+   ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ */
+typedef struct _CLIPPER_DATE {
+   unsigned nDay   : 5,
+            nMonth : 4,
+            nYear  : 7;
+} CLIPPER_DATE;
+
+typedef struct _CLIPPER_TIME {
+   unsigned nSecond : 5,
+            nMinute : 6,
+            nHour   : 5;
+} CLIPPER_TIME;
+
+struct lfnfind_t {
+   unsigned long  attrib;           // 0000
+   ULONG          fd_atimel;        // 0004
+   ULONG          fd_atimeh;        // 0008
+   ULONG          fd_mtimel;        // 000C
+   ULONG          fd_mtimeh;        // 0010
+   CLIPPER_TIME   wr_time;          // Last write time
+   CLIPPER_DATE   wr_date;          // Last write date
+   ULONG          fd_ctimeh;        // 0018
+   unsigned long  fd_sizehi;        // 001C
+   unsigned long  size;             // 0020
+   ULONG          fd_reservedl;     // 0024
+   ULONG          fd_reservedh;     // 0028
+   char           name[260];        // 002C
+   char           shortname[14];
+};
+
+struct find_t {
+   char           reserved[21];  // DTA block
+   char           attrib;        // Attributes
+   CLIPPER_TIME   wr_time;       // Last write time
+   CLIPPER_DATE   wr_date;       // Last write date
+   long           size;          // File size
+   char           name[14];      // Filename
+};
+
+// For use with _dspace
+struct diskfree_t {
+   unsigned avail_clusters;
+   unsigned sectors_per_cluster;
+   unsigned total_clusters;
+   unsigned bytes_per_sector;
+};
+
+// Standard ITEM api
+typedef struct
+{
+   USHORT type;
+   USHORT paramCount;
+   ITEM   item[ 10 ];
+} EVALINFO;
+
+typedef EVALINFO far * EVALINFOP;
+
+extern ITEM    _itemNew( ITEM item );
+
+extern USHORT  _itemType( ITEM item );
+extern USHORT  _itemSize( ITEM item );
+
+extern ITEM    _itemPutL ( ITEM item, BOOL log );
+extern ITEM    _itemPutC ( ITEM item, BYTEP str );
+extern ITEM    _itemPutCL( ITEM item, BYTEP str, USHORT len );
+extern ITEM    _itemPutNL( ITEM item, long lnum );
+extern ITEM    _itemPutND( ITEM item, XDOUBLE nd );
+extern ITEM    _itemPutDS( ITEM item, BYTEP dstr );
+
+extern BOOL    _itemGetL ( ITEM item );
+extern BYTEP   _itemGetC ( ITEM item );
+extern long    _itemGetNL( ITEM item );
+extern BYTEP   _itemGetDS( ITEM item, BYTEP buf );
+extern XDOUBLE _itemGetND( ITEM item );
+
+extern USHORT  _itemCopyC( ITEM item, BYTEP buf, USHORT len );
+extern BOOL    _itemFreeC( BYTEP str );
+
+extern ITEM    _itemArrayNew( USHORT uiSize );
+extern ITEM    _itemArrayGet( ITEM itemArr, USHORT uiElem );
+extern ITEM    _itemArrayPut( ITEM itemArr, USHORT uiElem, ITEM item );
+
+
+extern ITEM    _itemParam ( USHORT uiParam );
+extern ITEM    _itemReturn( ITEM item );
+
+extern BOOL    _itemRelease( ITEM item );
+
+extern BOOL    _evalNew     ( EVALINFOP evalP, ITEM eval );
+extern BOOL    _evalPutParam( EVALINFOP evalP, ITEM param );
+extern ITEM    _evalLaunch  ( EVALINFOP evalP );
+extern BOOL    _evalRelease ( EVALINFOP evalP );
+
+// Paramter functions
+ITEM     __cdecl  _param (int nParam, int nType);           /* Get local parameter with type mask */
+long     __cdecl  _lparam (int nParam);                     /* Get numeric parameter as long */
+
+// Parameter pushers
+void              __cdecl  _putc (char * cString);                   /* Put string parameter onto stack */
+void              __cdecl  _putcl (char * cString, unsigned nLen);   /* Put string (with length) parameter onto stack */
+void              __cdecl  _putl (int lBool);                        /* Put logical parameter onto stack */
+void              __cdecl  _putq (unsigned nInt);                    /* Put unsigned parameter onto stack */
+void              __cdecl  _putln (long nLong);                      /* Put long parameter onto stack */
+
+// Item allocation (Exactly the same as _itemNew() and _itemRelease())
+ITEM     __cdecl  _GetGrip (ITEM iLocalItem);               /* Copy Local Stack item to Memvar Table */
+void     __cdecl  _DropGrip (ITEM);                         /* Free memvar table item (Don't give it 0 !!!) */
+
+// Array functions
+void     __cdecl  _cResize (ITEM aArray, unsigned nSize);   /* aSize() for C programmers (This adds or removes the specified number of elements!) */
+short    __cdecl  _cCopy (ITEM aSource, ITEM aDest, unsigned nStart, unsigned nLen, unsigned nCount); /* aCopy() */
+void     __cdecl  _cAtPutStr (ITEM aArray, unsigned nElement, char * cString, unsigned nLength);
+void     __cdecl  _cAtPut (ITEM aArray, unsigned nElement, ITEM iItemToPut);     /* Put item into array */
+short    __cdecl  _cAt (ITEM aArray, unsigned nElement, int nType, ITEM iItem);  /* iItem = aArray[nElement] */
+
+// Virtual string/object functions
+USHORT   __pascal _VARRAYLEN (ITEM);                        /* Get length of an array */
+char *   __pascal _VSTR (ITEM value);                       /* Get reference to string */
+char *   __pascal _VSTRX (ITEM value);                      /* Get reference to string (Slightly different) */
+char *   __pascal _VSTR2 (ITEM value1, ITEM value2);        /* Get two strings into fixed memory */
+void     __pascal _VSTRLOCK (ITEM value);                   /* Lock string */
+void     __pascal _VSTRUNLOCK (ITEM value);                 /* Unlock string */
+char *   __pascal _VSTRCOLD (ITEM value);                   /* Get string to allocated copy.  Must _xfree when done */
+char *   __pascal _BYTESNEW (USHORT nSize);                 /* Create new string of specified length */
+char *   __pascal _BYTESNEW2 (USHORT nSize);                /* Create new string of specified length */
+char *   __pascal _BLOCKNEW (void);                         /* Create new code block - params ??? (new block in _eval) */
+VALUEP   __pascal _ARRAYNEW (USHORT nElements);             /* Create new array (new array is in ITEM _eval,
+                                                                        returns pointer to first item) */
+/* ÚÄÄÄÄÄÄÄÄÄÄ¿
+   ³ ASUPPORT ³
+   ÀÄÄÄÄÄÄÄÄÄÄÙ */
+char *   __cdecl strcpy (char * cDest, const char * cSource);        /* Just copy */
+char *   __cdecl stccpy (char * cDest, const char * cSource, unsigned nLength);  /* Copy until length or end of string */
+char *   __cdecl strncpy (char *, const char *, unsigned);           /* Copy to end of string, pad with 0's */
+unsigned __cdecl strlen (const char * cString);                      /* Duh! */
+char *   __cdecl strcat (char *, const char *);                      /* Get system time and evaluate code block concurrently... ;-) */
+
+char *   __cdecl stpchr (const char * buffer, char find);            /* strchr - pointer to character in buffer */
+char *   __cdecl stpblk (const char *);                              /* pointer to first char not SPACE, LF or TAB */
+
+void     __cdecl _bset (void *, char, unsigned);                     /* memset */
+void     __cdecl _bmove (void *, const void *, unsigned);            /* memmove */
+void     __cdecl _bcopy (void *, const void *, unsigned);            /* memcpy */
+void     __cdecl _bcopyf (void *, const void *, unsigned, unsigned); /* memcpy (Same as memcpy but pads with spaces to fourth parameter */
+int      __cdecl _bcmp (const void *, const void *, unsigned);       /* memcmp */
+unsigned __cdecl _bscan (const void *, unsigned, char);              /* get index of first occurance of char */
+
+char *   __cdecl _u2hex (unsigned);                                  /* Converts unsigned to 4 byte hex string (returns reference to static string!) */
+
+short    __cdecl _dosfunc (REGSP regs);                              /* intdos() clone */
+
+short    __cdecl _asmcall (unsigned nParams, unsigned ** ParamList); /* Call function with variable parameter list.  Why??? */
+
+/* ÚÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+   ³ Date & Time ³
+   ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÙ */
+char *   __cdecl _month_name (USHORT);                                        /* Month names */
+char *   __cdecl _day_name (USHORT);                                          /* Day names */
+long     __cdecl _dSysDate (void);                                         /* system date */
+long     __cdecl _dAlphaToDateDBF (const char * cDate, USHORT usLength);   /* "YYYYMMDD" to long date */
+char *   __cdecl _dDateToAlphaDBF (char * cBuffer, long lDate);            /* long date to "YYYYMMDD" */
+char *   __cdecl _dDateToAlphaFmt (char * cBuffer, long lDate);            /* long date to date format of setting */
+long     __cdecl _dDMYToDate (USHORT usDay, USHORT usMonth, USHORT usYear);
+void     __cdecl _ostime (OSTIMEP);                                        /* Get current time */
+
+/*ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+  ³ Some loverly variables ³
+  ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ */
+extern ITEM       __cdecl  __dgroup _eval;                           /* Last return value */
+extern USHORT     __cdecl  __dgroup _stackbase;
+extern USHORT     __cdecl  __dgroup _evalhigh;                       /* High point of Eval Stack */
+extern USHORT     __cdecl  __dgroup _estatlow;                       /* Low point of ITEM Table */
+extern USHORT     __cdecl  __dgroup _estat;                          /* Current point in ITEM Table ??? */
+extern USHORT     __cdecl  __dgroup _eextent;                        /* Last byte of used DGROUP */
+extern ITEM       __cdecl  __dgroup _tos;                            /* Current Top of eval stack */
+extern ITEM       __cdecl  __dgroup _lbase;                          /* Base of current activation in Eval Stack */
+extern ITEM       __cdecl  __dgroup _sbase;                          /* Base of statics for module */
+extern ITEM       __cdecl  __dgroup _fbase;                          /* Something? */
+extern USHORT     __cdecl  __dgroup _salt;                           /* Something to do with parameter return */
+extern USHORT     __cdecl  __dgroup _xlock;                          /* An indicator for PLANKTON to use _xunlock() */
+
+#define PARAM(nParam)      (_lbase + nParam + 1)
+     /* If you want to quickly access local parameters you can use the
+        PARAM macro.  Several internal Clipper functions appear to use this method */
+
+
+/* ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+   ³ Query // parameters to Clipper app ³
+   ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ */
+extern int      __cdecl _upref (char * cParam);                       /* Get clipper // parameter int value */
+extern char *   __cdecl _uprefp (char * cParam);                      /* Get clipper // parameter string value */
+
+/* ÚÄÄÄÄÄ¿
+   ³ I/O ³
+   ÀÄÄÄÄÄÙ */
+void     __cdecl _couterr (char * msg);                              /* simple enough */
+void     __cdecl _coutstd (char * msg);                              /* ditto */
+unsigned __cdecl _instd_ (void);                                     /* Standard Input */
+
+extern void __cdecl _errmsg  (char * cString);                       // Output message
+extern void __cdecl _errmsgn (char * cString, USHORT nNumber);
+extern void __cdecl _errmsgln (char * cString, ULONG nNumber);
+
+unsigned __cdecl _ntrimlen (char * cString, unsigned nStringLen);    /* See how long string would be without trailing spaces */
+
+/* ÚÄÄÄÄÄÄÄÄÄÄ¿
+   ³ TSUPPORT ³
+   ÀÄÄÄÄÄÄÄÄÄÄÙ */
+extern USHORT __dgroup _terror;                            /* DOS Error code */
+extern USHORT __dgroup _tversion;                          /* DOS Version */
+extern USHORT __dgroup _horror;
+extern USHORT __dgroup _txerror;
+extern USHORT __dgroup _txclass;
+extern USHORT __dgroup _txaction;
+extern USHORT __dgroup _txlocus;
+extern USHORT __dgroup _tlfn;                              /* Long filename flag (Not in standard Clipper) */
+
+int      __cdecl _tmkdir    (char __far * cDir);                     /* create directory */
+int      __cdecl _trmdir    (char __far * cDir);                     /* remove directory */
+int      __cdecl _tchdir    (char __far * cDir);                     /* Change directory */
+int      __cdecl _tcurdrv   (void);                                  /* current drive */
+int      __cdecl _tchdrv    (unsigned drive);                        /* change drive */
+int      __cdecl _tisdrv    (unsigned drive);                        /* logical status of drive being a drive */
+char *   __cdecl _tcurdir   (unsigned drive);                        /* current directory on drive */
+int      __cdecl _tisdevice (int handle);                            /* Is handle a valid device? */
+int      __cdecl _tdevraw   (int handle, int rawmode);               /* Set raw / cooked mode */
+int      __cdecl _tmname    (char __far * buffer);                   /* machine name */
+int      __cdecl _tctemp    (char __far * path, int pmode,char __far * tempname);   /* handle of file */
+int      __cdecl _thcount   (int handles);                           /* 0 | 1 */
+int      __cdecl _f_first   (char * path, struct find_t * buf, unsigned pmode);  /* find first matching file */
+int      __cdecl _f_next    (struct find_t * buf);                   /* find next matching file */
+void     __cdecl _dspace    (int drive, struct diskfree_t *inf);     /* diskspace */
+
+USHORT   __cdecl _f_firstlfn (char * path, struct lfnfind_t * buf, unsigned pmode);  /* find first matching file */
+USHORT   __cdecl _f_nextlfn  (USHORT nSearchHandle, struct lfnfind_t * buf);               /* find next matching file */
+USHORT   __cdecl _f_closelfn (USHORT nSearchHandle);

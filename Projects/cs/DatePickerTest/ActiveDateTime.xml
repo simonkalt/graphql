@@ -1,0 +1,257 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ActiveDateTime</name>
+    </assembly>
+    <members>
+        <member name="T:ActiveUp.WebControls.ActiveDateTime">
+            <summary>
+            This server control allows users to select a valid date and/or time trough selectors.
+            </summary>
+        </member>
+        <member name="M:ActiveUp.WebControls.ActiveDateTime.#ctor">
+            <summary>
+            The default constructor.
+            </summary>
+        </member>
+        <member name="M:ActiveUp.WebControls.ActiveDateTime.RegisterValidatorScript">
+            <summary>
+            Register the client side validation script in the ASP page.
+            </summary>
+        </member>
+        <member name="M:ActiveUp.WebControls.ActiveDateTime.OnPreRender(System.EventArgs)">
+            <summary>
+            Raises the PreRender event.
+            </summary>
+            <remarks>This method notifies the server control to perform any necessary prerendering steps prior to saving view state and rendering content.</remarks>
+            <param name="e">An <see cref="T:System.EventArgs"/> object that contains the event data. </param>
+        </member>
+        <member name="M:ActiveUp.WebControls.ActiveDateTime.DetermineRenderUplevel">
+            <summary>
+            Determine if we need to register the client side validation script.
+            </summary>
+            <returns>true if validation is needed; otherwise false.</returns>
+        </member>
+        <member name="M:ActiveUp.WebControls.ActiveDateTime.Render(System.Web.UI.HtmlTextWriter)">
+            <summary>
+            Sends server control content to a provided HtmlTextWriter object, which writes the content to be rendered on the client.
+            </summary>
+            <param name="output">The HtmlTextWriter object that receives the server control content.</param>
+        </member>
+        <member name="M:ActiveUp.WebControls.ActiveDateTime.GetMeridiemHour(System.Int32)">
+            <summary>
+            Return the meridiem hour from the military hour.
+            </summary>
+            <param name="hour">The military hour.</param>
+            <returns>The meridiem hour.</returns>
+        </member>
+        <member name="M:ActiveUp.WebControls.ActiveDateTime.GetMiliratyHour(System.Int32,System.Int32)">
+            <summary>
+            Return the miliraty hour from the specified meridiem hour.
+            </summary>
+            <param name="hour">The meridiem hour.</param>
+            <param name="meridiem">The meridiem.</param>
+            <returns>The military hour.</returns>
+        </member>
+        <member name="M:ActiveUp.WebControls.ActiveDateTime.WriteSelector(System.Web.UI.HtmlTextWriter,System.String,System.Web.UI.WebControls.Style,System.String,System.Int32,System.Int32,System.Int32,System.Int32,System.Boolean,System.Int32)">
+            <summary>
+            This method create a selector based on the parameters.
+            </summary>
+            <param name="output">The HtmlTextWriter to write.</param>
+            <param name="suffix">The suffix to use to identify the selector with the LoadPostData method.</param>
+            <param name="style">The style class to use.</param>
+            <param name="onchange">The value of the OnChange attribute of the selector to use with the client side validator.</param>
+            <param name="min">The minimum value of the selector.</param>
+            <param name="max">The maximum value of the selector.</param>
+            <param name="padding">The number of chars to use with padding.</param>
+            <param name="selectedValue">The selected value.</param>
+        </member>
+        <member name="M:ActiveUp.WebControls.ActiveDateTime.LoadPostData(System.String,System.Collections.Specialized.NameValueCollection)">
+            <summary>
+            Processes post back data for an the server control.
+            </summary>
+            <param name="postDataKey">The key identifier for the control.</param>
+            <param name="postCollection">The collection of all incoming name values.</param>
+            <returns>true if the server control's state changes as a result of the post back; otherwise false.</returns>
+        </member>
+        <member name="M:ActiveUp.WebControls.ActiveDateTime.RaisePostDataChangedEvent">
+            <summary>
+            Signals the server control object to notify the ASP.NET application that the state of the control has changed.
+            </summary>
+        </member>
+        <member name="M:ActiveUp.WebControls.ActiveDateTime.OnDateChanged(ActiveUp.WebControls.DateChangedEventArgs)">
+            <summary>
+            Raises the DateChanged event.
+            </summary>
+            <param name="e">An <see cref="T:ActiveUp.WebControls.DateChangedEventArgs"/> that contains the event data.</param>
+        </member>
+        <member name="E:ActiveUp.WebControls.ActiveDateTime.DateChanged">
+            <summary>
+            Occurs when the Date property value changes.
+            </summary>
+        </member>
+        <member name="P:ActiveUp.WebControls.ActiveDateTime.EnableClientScript">
+            <summary>
+            Gets or sets a value indicating whether client-side validation is enabled.
+            </summary>
+        </member>
+        <member name="P:ActiveUp.WebControls.ActiveDateTime.Date">
+            <summary>
+            Gets or sets the date of the control.
+            </summary>
+        </member>
+        <member name="P:ActiveUp.WebControls.ActiveDateTime.MinYear">
+            <summary>
+            Gets or sets the minimum year to display in the year selector.
+            </summary>
+        </member>
+        <member name="P:ActiveUp.WebControls.ActiveDateTime.MaxYear">
+            <summary>
+            Gets or sets the maximum year to display in the year selector.
+            </summary>
+        </member>
+        <member name="P:ActiveUp.WebControls.ActiveDateTime.AlertEnabled">
+            <summary>
+            Lets you specify if you want the control to show an alert popup when a invalid date is selected.
+            </summary>
+        </member>
+        <member name="P:ActiveUp.WebControls.ActiveDateTime.AutoAdjust">
+            <summary>
+            Set to true is we want to auto adjust the maximum and/or minimum year with the data.
+            </summary>
+            <remarks>Setting a high value to <see cref="P:ActiveUp.WebControls.ActiveDateTime.MaxYear"/> or setting a low value in <see cref="P:ActiveUp.WebControls.ActiveDateTime.MinYear"/> can produce performance problem.
+            For each year, more than 20 bytes are added to the browser HTML output.
+            By setting this property to true, you can prevent from exception throws without having to set very high maximum year or very low minimum year.
+            If the maximum year value is less than the actual date year value, the maximum year will be adjusted to the actual date year. Same for the minimum year.</remarks>
+        </member>
+        <member name="P:ActiveUp.WebControls.ActiveDateTime.BaseStyle">
+            <summary>
+            Gets the style properties of the date and time selectors base.
+            </summary>
+        </member>
+        <member name="P:ActiveUp.WebControls.ActiveDateTime.DateStyle">
+            <summary>
+            Gets the style properties of the date selectors.
+            </summary>
+        </member>
+        <member name="P:ActiveUp.WebControls.ActiveDateTime.Months">
+            <summary>
+            Gets or sets the month names.
+            </summary>
+            <remarks>
+            <code>
+            // This line will replace the january month name by 'Janvier'
+            MyDate.Months[0] = "Janvier";
+            
+            // This line will replace the december month name by 'Décembre (noel)'
+            MyDate.Months[11] = "Décembre (noel)";
+            </code>
+            </remarks>
+        </member>
+        <member name="P:ActiveUp.WebControls.ActiveDateTime.SetMonthNames">
+            <summary>
+            Sets the month names.
+            </summary>
+            <remarks>
+            This array of string contains the month names. You can set your own month names to match with your culture. If your website is in french, you will prefer use Février in replacment of February.
+            By default, the months are in english. If the <see cref="P:ActiveUp.WebControls.ActiveDateTime.MonthNamesDisabled"/> property is set to true, numbers will replace month names.
+            <code>
+            // Please verify that MonthNamesDisabled property is not set to true
+            &lt;AU:ActiveDateTime runat="server" id="CompleteSelector" Format="day;/;month;/;year; ;hour;:;minute;:;second;:;millisecond" SetMonthNames="Janvier,F&amp;eacute;vrier,Mars,Avril,Mai,Juin,Juillet,Ao&amp;ucirc;t,Septembre,Octobre,Novembre,D&amp;eacute;cembre"&gt;&lt;/AU:ActiveDateTime&gt;
+            </code>
+            </remarks>
+        </member>
+        <member name="P:ActiveUp.WebControls.ActiveDateTime.MonthNamesDisabled">
+            <summary>
+            Specify if you want to display month names or month numbers. False by default.
+            </summary>
+        </member>
+        <member name="P:ActiveUp.WebControls.ActiveDateTime.TimeStyle">
+            <summary>
+            Gets the style properties of the time selectors.
+            </summary>
+        </member>
+        <member name="P:ActiveUp.WebControls.ActiveDateTime.AlertText">
+            <summary>
+            Gets or sets the alert text to use when a invalid date is selected.
+            </summary>
+        </member>
+        <member name="P:ActiveUp.WebControls.ActiveDateTime.cssClass">
+            <summary>
+            Gets or sets the css class.
+            </summary>
+        </member>
+        <member name="P:ActiveUp.WebControls.ActiveDateTime.Format">
+            <summary>
+            Gets or sets the format to use to render the selectors.
+            </summary>
+            <remarks>You can specify the display layout using the <c>format specifiers</c> like <c>"hour"</c> or <c>"month"</c>.<br></br>
+            Fields must be separated by ; (semicolon) char. Non reconized fields are send to the HtmlTextWriter as literal text.<br></br>
+            Here are some examples (<c>[</c> and <c>]</c> represent a selector:<br></br><br></br>
+            <c>"month;/;day;/;year"</c> will display<br></br><c>[MONTH]/[DAY]/[YEAR]</c>.<br></br><br></br>
+            <c>"hour;:;minute"</c> will display<br></br><c>[HOUR]:[MINUTE]</c>.<br></br><br></br>
+            <c>"Date : ;day;/;month;/;year; Time : ;hour;:;minute;:;second"</c> will display<br></br><c>Date : [DAY]/[MONTH]/[YEAR] Time : [HOUR]:[MINUTE]:[SECOND]</c>.<br></br><br></br>
+            <table><tr><td bgcolor="#F0F0F0">Format Specifier</td><td bgcolor="#F0F0F0">Name</td></tr>
+            <tr><td><b>day</b></td><td>The day part (1 to 31).</td></tr>
+            <tr><td><b>month</b></td><td>The month part (1 to 12).</td></tr>
+            <tr><td><b>year</b></td><td>The year part (variable).</td></tr>
+            <tr><td><b>hour</b></td><td>The hour part (0 to 23).</td></tr>
+            <tr><td><b>minute</b></td><td>The minute part (0 to 59).</td></tr>
+            <tr><td><b>second</b></td><td>The second part (0 to 59).</td></tr>
+            <tr><td><b>millisecond</b></td><td>The millisecond part (0 to 999).</td></tr>
+            <tr><td><i>other literal</i></td><td>Rendered as literal text.</td></tr>
+            </table>
+            </remarks>
+        </member>
+        <member name="P:ActiveUp.WebControls.ActiveDateTime.Enabled">
+            <summary>
+            Gets or sets then enabled state of the control.
+            </summary>
+            <remarks>
+            This was added by Todd Davis
+            </remarks>
+        </member>
+        <member name="P:ActiveUp.WebControls.ActiveDateTime.AllowNull">
+            <summary>
+            Gets or sets then value indicating if the control can accept null value (DateTime.MinValue).
+            </summary>
+        </member>
+        <member name="P:ActiveUp.WebControls.ActiveDateTime.NullString">
+            <summary>
+            Gets or sets then string (char) to display for the null selection.
+            </summary>
+        </member>
+        <member name="P:ActiveUp.WebControls.ActiveDateTime.Use24HourFormat">
+            <summary>
+            Gets or sets value indicating if you want to use the 24h (military) format.
+            </summary>
+        </member>
+        <member name="T:ActiveUp.WebControls.ActiveDateTime.DateChangedEventHandler">
+            <summary>
+            The DateChanged event handler.
+            </summary>
+        </member>
+        <member name="T:ActiveUp.WebControls.DateChangedEventArgs">
+            <summary>
+            Provides data for the DateChanged events of the Active DateTime control.
+            </summary>
+        </member>
+        <member name="M:ActiveUp.WebControls.DateChangedEventArgs.#ctor(System.DateTime,System.DateTime)">
+            <summary>
+            Initializes a new instance of DateChangedEventArgs class.
+            </summary>
+            <param name="oldDate"></param>
+            <param name="newDate"></param>
+        </member>
+        <member name="P:ActiveUp.WebControls.DateChangedEventArgs.OldDate">
+            <summary>
+            The date value before the change.
+            </summary>
+        </member>
+        <member name="P:ActiveUp.WebControls.DateChangedEventArgs.NewDate">
+            <summary>
+            The date value after the change.
+            </summary>
+        </member>
+    </members>
+</doc>

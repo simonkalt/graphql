@@ -1,0 +1,143 @@
+/*
+** 	BRIEF -- Basic Reconfigurable Interactive Editing Facility
+**
+** 	Written by Dave Nanian and Michael Strickman.
+*/
+
+/*
+** 	indentx.cb:
+**
+** 	These macros allow control of the automatic indenting feature of
+** Brief.  They work on a buffer by buffer basis, by altering the local
+** keyboard (as determined by the BPACKAGES settings).  These macros
+** do NOT care what langauges are used, or even if the <Enter> key is
+** ever really set to anything other than 'self_insert'.
+**
+**    This package, particularly 'indentx' was developed for the cut &
+** paste feature of Curtis Palm/SofSolution's "Expert Help Hypertext
+** Search Engine (tm)".  I assumed that the engine will be able to call
+** the indentx macro before and after the cut & paste by stuffing
+** "<F10>indentx 1" into the keyboard buffer.  The 1 argument suppresses
+** text messages during the 'automated' operation.
+**
+**    By limiting the toggle macro name to 'indentx' the user doesn't
+** even have to add an 'autoload' entry to his initials macro.  Of
+** course, if an 'autoload' line is added, then the other macros can be
+** used before a call to 'indentx' is issued.
+**
+**    Suggested 'autoload':
+**
+**    (autoload "indentx", "indentx", "inq_indent", "indent_off", "indent_on");
+**
+**
+**    Known Bugs
+**    ----------
+**    This package assumes indenting will be re-enabled before indenting
+** is turned off in another buffer.  The the old 'local_keyboard' handle
+** is stored in a global variable, and thus this package is not reentrant.
+** In practice, this is not much of a limitation.
+**
+**
+**    History
+**    -------
+**    91.02.19 - Mitchell A Smith:  created
+**               can be reached via:
+**                 SofSolutions BBS,      user id 'msmith'
+**                 Solution Systems BBS,  user id 'mas'
+**                 snail mail: 61 Greenmeadow Ave, Thousand Oaks, CA 91320
+*/
+
+/* Global Variables *******************/
+int _oldLocalKeyboard;
+
+/* Function Prototypes ****************/
+void _init (void);
+void indent_off (void);                /* set indenting off */
+void indent_on (void);                 /* restore indenting */
+int  inq_indent (void);                /* get indenting state */
+int  indentx (~int);                   /* toggle indenting state */
+
+/****************************************************************************/
+void _init (void)
+{
+   /* set the global variable, in case the user calls 'indent_on()'
+   ** without first calling 'indent_off()'.
+   */
+   _oldLocalKeyboard = inq_local_keyboard();
+}
+
+
+/* indent_off:
+**
+** Turn off indenting.
+*/
+void indent_off (void)
+{
+   int newLocalKeyboard;
+
+   _oldLocalKeyboard = inq_local_keyboard();
+   
+   keyboard_push();
+	assign_to_key("<Enter>", "self_insert");
+	newLocalKeyboard = inq_keyboard();
+   keyboard_pop(1);
+
+   use_local_keyboard(newLocalKeyboard);
+}
+
+/* indent_on:
+**
+** Turn on (restore) indenting.
+*/
+void indent_on (void)
+{
+   use_local_keyboard(_oldLocalKeyboard);
+}
+
+/* inq_indent:
+**
+** Get the status of 'indenting', 1 if active, 0 if inactive;
+** also show status as a text message if 'inq_indent' is called from
+** the keyboard, or with a non-zero argument.
+*/
+int inq_indent (~int)
+{
+   int showMessage;
+   string indentMacro = inq_assignment ("<Enter>");
+   int indentState = (indentMacro != "self_insert");
+
+   /* user called from keyboard, report status in a text message */
+   if (inq_called() == "" || (get_parm (0, showMessage) && showMessage))
+      {
+      if (indentState)
+         message("Indenting ON  (using '%s' macro).", indentMacro);
+      else
+         message("Indenting off.");
+      }
+
+   return (indentState);               /* return current state */
+}
+
+
+/* indentx:
+**
+** Toggle the indenting state, returning the previous indentign state.
+** Also show the new status as a text message if 'indentx' is called
+** from the keyboard without any argument.
+*/
+int indentx (~int)
+{
+   int noMessage;
+   int indentState = inq_indent(0);
+
+   if (indentState)
+      indent_off();
+   else
+      indent_on();
+
+   /* user called from keyboard, report status in a text message */
+   if (inq_called() == "" && ! get_parm (0, noMessage))
+      inq_indent(1);
+
+   return (indentState);               /* return previous state */
+}

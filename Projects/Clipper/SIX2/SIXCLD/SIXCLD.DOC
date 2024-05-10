@@ -1,0 +1,268 @@
+  SIxCLD 1.1   SIx Driver's replacement for the F6 key
+
+
+  SIxCLD for CDX support
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³List of files in SIXCLD.EXE ³
+ ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³SIXCLD.OBJ     For use with Clipper 5.2 and Six Driver 2.0              ³
+ ³SIXCLD.DOC     This documentation file (German docs also available).    ³
+ ³6CLDREAD.ME    Please read this. You'll find last minute changes here   ³
+ ³6CLD.LNK       Sample link script to use SIxCLD                         ³
+ ³TEST6CLD.BAT   Generates T6CLD, generates some db files and starts T6CLD³
+ ³MAKEDBF.BAT    Generates db files to be used with                       ³
+ ³TEST6CLD.PRG   Small test program for testing SIxCLD                    ³
+ ³TEST6CLD.RMK   Make file for the test program (Generates T6CLD.EXE)     ³
+ ³6CLDSRC.EXE    Password protected source file (for details see below).  ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+  The source code is in one PRG. Manifest contants control language
+  support, Clipper 5.2 support and support for SIx Driver flavors.
+
+  ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+  ³ What is SIXCLD ?  ³
+  ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+  SIxCLD is an enhancement to the Clipper debugger. You get much more
+  control on your databases, indexes, relations than CLD provides.
+  In addition, SIxCLD gives you the power to control almost all additional
+  features you get from SIx Driver, e.g. arrays in memos, scopes and .INI
+  files just to mention three outstanding features not supported by CLD.
+  For more see below.
+
+  SIxCLD is completely free for SIx users. The source code is copyrighted
+  and is available for a small fee.
+
+  ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+  ³ How to use SIXCLD ? ³
+  ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+
+  For debugging sessions, link as follows:
+
+      FILE testsix        // your app you want to debug
+      BEGINAREA
+        FI sixcld2c       // the F6 replacement for the debugger
+        #FI sixcld2n      // for your favorite flavor (see above)
+
+        FILE sixtools     // other SIx Driver stuff
+        ALLOCATE Extend
+        ALLOCATE samples  //  I now use the scroll bar and some environment
+      ENDAREA             // functions
+      @six2.lnk
+
+  It's strongly recommended to follow SIXDEMO.LNK when it comes to setting
+  Blinker switches.  In tight memory situations you may want to use CLD.LIB.
+  Here's an example:
+
+      FILE testsix        // your app you want to debug
+      BEGINAREA
+        FI cld.lib        // debugger lib
+        FI sixcld2c       // the F6 replacement for the debugger
+        #FI sixcldn       // or your favorite flavor (see above)
+
+        FILE sixtools     // other SIx Driver stuff
+        ALLOCATE Extend
+        ALLOCATE samples
+      ENDAREA
+      @six2.lnk
+
+  To see what SIxCLD does, launch CLD and press F6:
+
+  CLD testsix
+  F5                  // run to first wait state
+  ALT-D               // switch to debugger after initializing DBF files
+  F6                  // explore SIxCLD
+
+ ºNote:
+ º
+ ºWhat to do with 'Error Base/1077, incorrect argument: .NOT.' ?
+ º
+ ºThis SHOULD only happen when SIxCLD (any version) is linked in, but the
+ ºEXE has NOT been started under the debugger. You may also work around
+ ºthis problem by linking in CLD.LIB. This restriction is due to SIxCLD
+ ºusing an internal function (__dbgclr) and this requiring some other
+ ºdebugger stuff. If you run into this problem in situations other than
+ ºthe above mentioned, please let me know immediately.
+
+ ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+ ³ What do I get from SIxCLD ? ³
+ ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+   SIxCLD consists of one main screen (access key: ALT-M) and 5 subwindows.
+  The main screen offers database selection for all subwindows. While
+  scrolling through all open DBF files, more detailed information on the
+  currently selected DBF status is shown in the upper section. This includes
+  SCOPEs, encryption status, Auto-Open status and much more.
+  The dbf info currently selected by the application (if any) is always
+  hilighted using cld's menu color.
+  The current index key is displayed on the bottom line of the upper screen.
+  Warning's are displayed in the following cases:
+   * your current work area has no dbf in use
+   * the current app key is not in scope (if applicable)
+   * the current app record does not match the order for condition
+     (if applicable)
+   When moving on to any of the subwindows the currently hilited DBF remains
+  always the one further information is given on.
+
+   The main menu is shown on the bottom line. You may use the TAB key or the
+  ALT key together with the hilited fast access key. In addition, in most
+  cases LEFT/RIGHT ARROW keys work similar to TAB and SHIFT-TAB. (Exceptions
+  are with those screens where left/right panning is supported, i.e Browse
+  screen and Trigger screen.). Almost all browses have fast access facilities.
+  Just press a character key and see what happens. Some screens allow for
+  reordering (use ALT-R) by a second criterion. If you do so, you change the
+  fast access mechanism to work on this field.
+
+  In addition to the main menu you have the following keys working
+  ALT-R   reorders by alias name (1st column)
+  ALT-Z   zooms into relation browser
+  ALT-F   expands filter expression if longer than 25 characters
+  <char>  jump to next alias starting with this character
+  ENTER   for a direct jump to the dbf browser
+
+  Recommendation: TAB and ENTER are the preferred keys for fast movement
+  SIxCLD automatically detects whether to stop on a screen or not. (If
+  the next screen has no valid information for you, its just skipped.)
+  Only when accessing them directly using the respective ALT key you may
+  get a warning message.
+
+  ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+  ³ The Index Order Subwindow ³      Access key: ALT-0
+  ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+   This subwindow lets you browse through all indexes currently open with the
+  DBF file hilited in the main screen. Detailed information on the currently
+  hilited order is given in the upper section, e.g. key count. For long key
+  expressions or for long order conditions you may expand them to full length.
+  Use ALT-K or ALT-F respectively. ALT-R reorders by tag name or toggles back
+  to order by work area. You may want to display all current application keys
+  instead of the for condition. Use ALT-A as to toggle last column.
+
+
+  ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+  ³ The Network Subwindow ³          Access key: ALT-N
+  ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+    This subwindow has three sections, one on DBF related issues (Read-Only
+  status, dirty area status, FLOCK status , locked records and more). One is
+  on switches like autoshare, autoopen, lock retry. The third section shows
+  information on order related issues, e.g. ROXLOCK. These may also be found
+  in the Index order subwindow.
+
+  ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+  ³ The DBF Structure Subwindow ³    Access key: ALT-S
+  ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+    In this subwindow all structure of the DBF currently hilited in the main
+  screen is displayed. In addition the field contents are given. You may
+  even view a memo field, no matter if it contains character information or
+  an array. BLOBs are currently not supported.
+   If your database has many fields you may like to jump to a field by simply
+  pressing its first character. If there are more fields having the same
+  first character, you just keep on jumping forward by pressing that character
+  again.
+   You also may toggle fields for being selected for the browse or not. It
+  might help you with big databases. Use the SPACE bar to toggle. A check
+  mark in the first column is shown when fields are selected and a hilite
+  color is used. By default all fields are used in the browse subwindow. As
+  long as you don't choose a new DBF for debugging the tagged fields will
+  remain active.
+
+  ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+  ³ The Browse Subwindow ³         Access keys: ALT-B
+  ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                      ENTER (only from main screen)
+
+   This subwindow browses through the DBF currently hilited in the main
+  screen. In the upper section it gives information on the current status
+  compared to the status on entering sixcld by pressing F6. The index key
+  valid in the application and that of the current record your sitting on in
+  SIxCLD are displayed. The application record is hilighted using cld's
+  menu colors. It may not be seen, because the application record pointer
+  is not in scope.
+
+  You may want to perform a seek. A search pattern for the currently active
+  order may be entered for this. You may also want to choose a different
+  order. Just press N for 'next order' or P for 'previous order'. Then press
+  S to perform a new seek.
+
+  In addition, you may toggle SET DELETED and SET SOFTSEEK status for
+  testing. Deleted records are displayed in a different color, in case
+  you can see them (i.e. DELETED is OFF).
+
+  The J key should bring you back to the initial record number. Due to
+  Clipper (or is it me?) having problems with synchronising tbrowse, this
+  may not always work correctly.
+
+  ALT-P allows you to enter the password for decrypting. Only active if
+  DBF or record is encrypted.
+
+  The ENTER key brings you back to the main screen. This is only valid
+  when you're not currently sitting on a memo field. In this case you
+  can view the memo contents no matter what type. ALT-M also triggers
+  the memo viewer.
+
+  ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+  ³ The Trigger/.INI Subwindow ³     Access key: ALT-I
+  ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+   This subwindow shows information on Triggers and on .INI files. In the
+  upper section the trigger function name is given. For all triggerable
+  events we show whether the triggered event should be successfully completed
+  or not. The lower section on .INI files is devided into to subsections.
+  The right one is for browsing through section headers in the .INI file
+  and the left on shows all information found for the hilited header name.
+  If necessary you may switch to the info section and scroll through all
+  information.
+   This subwindow is only accessable when the DBF file currently selected
+  in the main screen is controlled by SIXCDX. Otherwise the ALT-T option
+  simply does not work.
+
+  ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+  ³ Returning to CLD ³
+  ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+  On return to Clipper's debugger ALL changes mentioned below will be reset:
+  - lastkey value
+  - selected work area
+  - selected order
+  - record number
+  - found() status (may not work correctly with descending orders!)
+  - SET DELTED status
+  - SET SOFTSEEK status
+  - screen and cursor
+
+  No editing of databases is allowed while in SIxCLD.  No .INI files are
+  allowed to be edited. Triggers may not be disabled or removed.
+
+  ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+  ³ Support for other RDDs ³
+  ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+   In addition to SIx 2.0, all RDDs coming with Clipper 5.2d except for
+  DBPX (at least I did not test it) are supported by SIxCLD, i.e. DBFNTX,
+  DBFNDX, DBFCDX, DBFMDX. It is not recommended to use more than two of the
+  above in one application as long as you're not using ExoSpace or Blinker
+  3.0. You still have to link SIX2.LIB, even if you want to use SIxCLD for
+  debugging applications using other RDDs than SIx 2.0 only.
+  If you want to add more RDD support you may be interested in buying the
+  source code. See the next section for more details.
+
+  ÚÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+  ³ Source code ³
+  ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+   If you want to have support for more RDDs or add more features to SIxCLD,
+  you may buy the complete source code. It's completely written in Clipper
+  5.2d and heavily commented (in English, of course). The source code is
+  available in the US for $15, in the UK for 9 BPS and in Germany for 25 DM.
+  Just send the amount given above to SuccessWare in the US or in Europe to:
+
+      dc soft GmbH
+      Machtlfinger Str. 26
+      81379 Muenchen
+      Germany
+      phone: +49-89-785 891-0
+      fax:   +49-89-785 891-11
+
+  ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+  ³ Technical support ³
+  ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+  If you have found a bug, please send a report to dc soft GmbH or to
+  my CIS ID (see below). There's no tech support for SIxCLD through
+  SuccessWare.
+
+  Dieter Crispien (CIS ID: 100016,1673)
+
+

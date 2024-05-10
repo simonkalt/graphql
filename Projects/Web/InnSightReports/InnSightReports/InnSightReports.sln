@@ -1,0 +1,18 @@
+Microsoft Visual Studio Solution File, Format Version 1.00
+Project("{BDD4A1A1-7A1F-11D0-AC13-00A0C91E29D5}") = "www.wbwd.net/InnSight", "InnSightReports.vip", "{851A1178-8686-4BF9-B400-FDA3D311EED6}"
+	ProjectSection(SourceCodeControl) = preProject
+		SccAuxPath = 
+		WebServer = http://www.wbwd.net
+		WebName = InnSight
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(LocalDeployment) = postSolution
+		StartupProject = {851A1178-8686-4BF9-B400-FDA3D311EED6}
+	EndGlobalSection
+	GlobalSection(BuildOrder) = postSolution
+		0 = {851A1178-8686-4BF9-B400-FDA3D311EED6}
+	EndGlobalSection
+	GlobalSection(DeploymentRoot) = postSolution
+	EndGlobalSection
+EndGlobal

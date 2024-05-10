@@ -1,0 +1,20 @@
+Microsoft Visual Studio Solution File, Format Version 1.00
+Project("{BDD4A1A1-7A1F-11D0-AC13-00A0C91E29D5}") = "dev.goconcierge.net/", "GoConcierge.vip", "{DB0A6A73-E128-4ECB-BF89-544FC39FBBCC}"
+	ProjectSection(SourceCodeControl) = preProject
+		SccProjectName = $/dev.goconcierge.net
+		SccAuxPath = 
+		SccLocalPath = .\\GoConcierge_Local
+		WebServer = http://dev.goconcierge.net
+		WebName = /
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(LocalDeployment) = postSolution
+		StartupProject = {DB0A6A73-E128-4ECB-BF89-544FC39FBBCC}
+	EndGlobalSection
+	GlobalSection(BuildOrder) = postSolution
+		0 = {DB0A6A73-E128-4ECB-BF89-544FC39FBBCC}
+	EndGlobalSection
+	GlobalSection(DeploymentRoot) = postSolution
+	EndGlobalSection
+EndGlobal

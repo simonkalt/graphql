@@ -1,0 +1,63 @@
+vti_encoding:SR|utf8-nl
+javascript\:addline('rewardsprogram'):guestprofileframe.asp
+loadingappointments.asp:appointment.asp
+images/eraser.gif:guestprofilesetup.asp
+reportnewlocationworksheet.asp:administration.asp
+images/qlcalloutsquare.gif:switchboard3.asp
+assignlocationstohotels.asp:administration.asp
+locationtooltip.asp:browselocations.asp browsedetail2.asp
+setupcompanies.asp:administration.asp
+javascript\:addline('addresstype'):guestprofileframe.asp
+javascript\:addline('phonetype'):guestprofileframe.asp
+javascript\:addline('importantdates'):guestprofileframe.asp
+images/background_pinstripe.jpg:administration.asp
+editcompanytemp.asp:edittemplate.asp
+deleterights.asp:tooltip.asp
+clientuploads/<%=remote.session("screenlogolocation")%>:switchboard3.asp
+deleteapptconfirm.asp:tooltip.asp appointment.asp
+browseselect2.js:appointment.asp
+directionsmain.asp:administration.asp
+hotelsetupnewmain.asp:administration.asp
+setupactiontypes2.asp:administration.asp
+../arview2.cab:appointment.asp
+copytask.asp:tooltip.asp appointment.asp
+javascript\:addline('familymembers'):guestprofileframe.asp
+setupactions.asp:administration.asp
+locationsetup3.asp:switchboard3.asp
+searchbystate.asp:administration.asp
+marqueeadmin.asp:administration.asp
+clientuploads/<%=rscompany("logolocation")%>:hotelsetup.asp
+javascript\:addline('chargetype'):guestprofileframe.asp
+loadingappointment.asp:browselocations.asp tasksearchdetail.asp guestprofilehistory.asp taskpad.asp browsedetail2.asp
+assignlocations/assignlocations.asp:administration.asp
+remindersummary.asp:switchboard3.asp
+clientuploads/<%=rscompany("screenlogolocation")%>:hotelsetup.asp
+reportlocationprints.asp:administration.asp
+nullsrc():switchboard3.asp editdescription.asp
+assigncompanytohotelgroup.asp:administration.asp
+images/btn_go.gif:guestprofilesetup.asp
+arview2.cab:switchboard3.asp
+javascript\:addline('preferences'):guestprofileframe.asp
+dayview.asp:appointment.asp
+printbackup.asp:switchboard3.asp
+selectcompany.asp:switchboard3.asp administration.asp
+roomsetup.asp:administration.asp
+clsid\:8569d715-ff88-44ba-8d1d-ad3e59543dde:switchboard3.asp appointment.asp
+eventsmain.asp:switchboard3.asp
+reportmissinglocationdata.asp:administration.asp
+venuesetup.asp:administration.asp
+appointmenttasknotes.asp:appointment.asp
+hotelsetupconfirm.asp<%=strqs%>:hotelsetup.asp
+bannerholder.asp:switchboard3.asp
+tasksearch.asp:switchboard3.asp
+setupappointmentnotes.asp:administration.asp
+taskreport.asp:switchboard3.asp
+loadingdiv.asp:switchboard3.asp addeditlocationcontactedit.asp
+usersetupnew.asp:administration.asp
+images/clockyellow.gif:appointment.asp
+checkiftaskexists.asp:tasksearchdetail.asp tooltip.asp taskpad.asp appointment.asp
+images/windowclose.gif:tooltip.asp
+setupsuppression.asp:administration.asp
+addcat.asp:administration.asp
+recurrencedelete.asp:tooltip.asp
+csswitchboard.asp:administration.asp

@@ -1,0 +1,35 @@
+<!--==Visual InterDev Generated - startspan==-->
+<!--METADATA TYPE="TypeLib" NAME="Microsoft ActiveX Data Objects 2.5 Library" UUID="{00000205-0000-0010-8000-00AA006D2EA4}" VERSION="2.5"-->
+<!--METADATA TYPE="TypeLib" NAME="Microsoft XML, v2.6" UUID="{F5078F18-C551-11D3-89B9-0000F81FE221}" VERSION="2.6"-->
+<!--==Visual InterDev Generated - endspan==-->
+<SCRIPT LANGUAGE=VBScript RUNAT=Server>
+Sub Application_OnStart
+	'--Project Data Connection
+		Application("sqlInnsight_ConnectionString") = "Provider=SQLOLEDB;Password=sequoia;Persist Security Info=True;User ID=innsight_user;Initial Catalog=Innsight;Data Source=Shaq2;Use Procedure for Prepare=1;Auto Translate=True;Packet Size=4096"
+		'Application("sqlInnsight_ConnectionString") = "Provider=SQLOLEDB;Password=sequoia;Persist Security Info=True;User ID=innsight_user;Initial Catalog=Innsight;Data Source=shaq;Use Procedure for Prepare=1;Auto Translate=True;Packet Size=4096"
+		Application("sqlInnsight_ConnectionTimeout") = 15
+		Application("sqlInnsight_CommandTimeout") = 30
+		Application("sqlInnsight_CursorLocation") = 3
+		Application("sqlInnsight_RuntimeUserName") = "innsight_user"
+		Application("sqlInnsight_RuntimePassword") = "sequoia"
+		Application("DSN") = "InnSightReports"
+		Application ("DotNetDSN") = "Password=sequoia;User ID=sa;Initial Catalog=Innsight;Data Source=Shaq2"
+		
+		Application("ENV_PATH") = "e:\website\dev.goconcierge.net\"
+		Application("DEBUGMODE") = "dev"
+		Application("HomePage") = "http://dev.goconcierge.net"
+		
+	'-- Project Data Environment
+		'Set DE = Server.CreateObject("DERuntime.DERuntime")
+		'Application("DE") = DE.Load(Server.MapPath("Global.ASA"), "_private/DataEnvironment/DataEnvironment.asa")
+	'==Visual InterDev Generated - endspan==
+End Sub
+
+Sub Session_OnSTart
+	Session.Timeout = (60*2)
+End Sub
+
+Sub Session_OnEnd
+	Session.Contents.RemoveAll()
+End Sub
+</SCRIPT>

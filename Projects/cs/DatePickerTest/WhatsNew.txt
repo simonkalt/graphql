@@ -1,0 +1,21 @@
+Active DateTime v1.2
+[24-11-2003]
+
+- Added: You can now select date using ante & post meridiem (AM/PM). 
+- Added: The selector now allow null dates (DateTime.MinValue).
+- Added: Enabled property (added by Todd Davis - Ceridian - US).
+- Added: CssClass property (added by Dave Friedel - Logik Online - DE).
+- Added: Default month names are now abreviations (added by James Still - Menlo Worldwide - US).
+- Added: Default date is not NULL (added by James Still - Menlo Worldwide - US).
+- Added: More code comments (added by James Still - Menlo Worldwide - US).
+- Fixed: The problem with Credit Card like selectors and leap year.
+
+Active DateTime v1.1
+[10-01-2003]
+
+- Fixed: Some issues.
+
+Active DateTime v1.0
+[27-09-2002]
+
+- Initial release

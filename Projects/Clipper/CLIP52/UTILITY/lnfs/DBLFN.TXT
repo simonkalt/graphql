@@ -1,0 +1,108 @@
+                        Dark Black Software Limited
+
+    DBLFN - The Dark Black Long FileName Patch Library for Clipper 5.x
+                              Version 0.01á
+
+        THE OFFICIAL BIT: We (Dark Black Software Limited) will
+        not be held responsible for any damage or loss of date
+        incured whilst using this software.  So, use it at your
+        own risk.
+
+What does it do?
+
+   Well, put simply, it allows your DOS based Clipper executables to use
+   Windows '95 long filenames.  You simply link in the supplied library
+   and your program will automatically support Win95 long filenames.
+
+Will it do it in Protected Mode?
+
+   Yes.  It's been tested with Blinker 4.10 in protected mode, so we'd
+   like some poor^H^H^H^Hkind sole to try it with the others...
+
+How does it do it?
+
+   We've basically replaced two internal (arrgh!) Clipper modules with our
+   own to replace the standard file handling support.
+
+What will it not do?
+
+   It will not fix yor programs, nor will it allow you to sleep at night.
+   For that you will need MrDebug - The replace Clipper debugger, which,
+   strangely enough, is also written by us... ;-)
+
+How do I use it?
+
+   Simply link in the supplied DBLFN.LIB file into your program, oh, and
+   make sure you SEARCH it.  If you are specifying CLIPPER.LIB in your
+   link script, then DBLFN.LIB should be placed BEFORE it.  Example:
+
+        FILE test
+        SEARCH dblfn
+
+What changes do I need to make?
+
+   None!  With the possible exception of anything you display as a result
+   of getting filenames from the Directory() function, as DBLFN's version
+   can obviously return filenames that are 256 characters long, instead of
+   13.  I'll leave the display problems to you... ;-)
+
+What will it work with?
+
+   It'll work with any version of DOS.  BUT, it will only provide long
+   filenames when running under Windows '95.  This means that it will NOT
+   work under DOS 7.00.  Nor will it work under NT 4.00 as Microsoft, in
+   their infinite wisdom, saw fit to omit the interrupt calls, even though
+   the OS supports VFAT... <g>
+
+How did I get the source?
+
+   Well, ask any Clipper hacker and he'll (sorry ladies, but the English
+   language was never designed with feminists in mind...) tell you the
+   same thing: "Get yourself a copy of OBJASM or OBJTOASM".  Quite simply,
+   it will convert a .OBJ file into a .ASM file.  Very often they need a
+   little work to recompile, but it saves a lot of time and effort.  This
+   is why you will see some strange label names in the source ($L38 for
+   example).  I wouldn't use these names myself of course, but haven't got
+   round to changing them all to something meaningful.
+
+   Is this legal?  Mmmmm.  Probably not quite according to the CA license
+   agreement, but they would find it would hurt their revenue if they
+   stopped all of the 3rd party vendors from doing this as they add to the
+   value of the product enormously.
+
+   Although, I wouldn't recommend doing it to a M$ product though...  ;-)
+
+How much does it cost?
+
+   Nothing!  That's right, it's PD.  Gratis.  Free.  That's why you get
+   the source code.
+
+What will it do in the future?
+
+   Well, that's pretty much up to you.  This is the very first release, so
+   it's just the bare essentials at the moment.  What do you WANT it to
+   do?
+
+What still needs fixing/replacing?
+
+   Currently if you, for example, open a DBF file called "Test File.DBF",
+   then the result alias would be "TEST FILE" which is, of course,
+   invalid.  So, I'll need to fix this.  For the moment, you can use the
+   ALIAS parameter.
+
+   Also, the DBF file creating/opening routines currently chop the
+   filename portion of files to 16 characters.  So, for example, if you
+   had "C:\An exceedingly long filename.DBF", it would turn out as
+   "C:\An exceedingly l.DBF".  This fix involves some nasty frigging of
+   several internal modules, and so will take a little longer to 'fix'.
+
+   Exospace support needs doing.
+
+   And anything else that you wish for that I agree to.
+
+What needs testing?
+
+   If anyone out there is still using Clipper 5.00 or 5.01, then could you
+   check and make sure that all functions are implemented.  I've done my
+   best to remember the old function names for all of the file I/O, but I
+   don't have 5.0x installed at the moment, so if you could check?  ;-)

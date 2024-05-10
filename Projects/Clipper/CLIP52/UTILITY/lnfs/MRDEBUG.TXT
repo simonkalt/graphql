@@ -1,0 +1,318 @@
+    VOICE             Dark Black Software Limited             MODEM
+(0480) 403104                2 Hempsals                   (0480) 471465
+                       Eaton Ford, St. Neots
+                 Huntingdon, Cambridgeshire PE19 3QZ, England
+
+   Copyright Dark Black Software Limited 1994. All Rights Reserved
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+                    MrDebug Version 1.1 RELEASED!!!
+                    ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+Dark Black Software Limited of St. Neots, England, authors of the worlds
+most favourite debugger for CA-Clipper announce that MrDebug version 1.1
+has now been released to the world.
+
+MrDebug, priced at œ99, is the ultimate in debugging technology offering
+serious tools to serious Clipper programmers.
+
+MrDebug 1.0 was a evolutionary breakthrough in debugging technology for
+CA-Clipper users. MrDebug 1.1 makes strengthens MrDebug's claim as best
+new CA-Clipper product.
+
+MrDebug 1.1 takes debugging technology one step further with GPF
+handling and Assertion checking and many user requests for features and
+additions.
+
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+MrDebug 1.1 lists the following features and enhancements (in addition to
+features already in MrDebug 1.00).
+
+ALTD() function Changes:
+   ALTD() now returns .T. if MrDebug is linked in
+   ALTD( 2 ) - Animate the program
+   ALTD( 3 ) - halt animation and run the program
+   ALTD( 4 ) - start speed mode
+   ALTD( 5 ) - halt speed mode
+   ALTD( 6 ) - bring up the workarea screen
+   ALTD( 7 ) - start profiling
+   ALTD( 8 ) - stop profiling
+   ALTD( 9 ) now creates a dump file
+   ALTD( 10 ) refreshes all MrDebug windows
+
+ALERT() function enhancement:
+   An keystroke ALT-D will now interrupt an ALERT function.
+
+ASSERTion/TRACE Checking
+   MrDebug 1.1 now includes Assertion checking with TRACE and ASSERT
+   functions that send messages to a new ASSERT/TRACE Window. A debugger
+   is the perfect place for an ASSERTion checker.
+
+AUTOSAVE
+   This option will automatically save your setup when you leave MrDebug
+   so that you don't loose any settings that you make.
+
+BREAKPOINTS:
+   The ability to select and mark source code as a Trace or Watch point.
+   This even allows you to mark an expression as a trace or watch point.
+   Even the mouse can be used!
+
+BREAK COUNT POINTS
+   Will stop program execution after a line has been called 'n' many
+   times.
+
+CA-TOOLS COMPATIBILITY
+   MrDebug 1.1 provides compatibility with CA-Tools windowing functions
+   through MrWindow.LIB, a true windowing library that users may use in
+   their own applications.
+
+COLOURS
+   Not everyone likes our colours - so you can set your own colours for
+   anything. You can even have up to five different colours settings.
+
+CONDITIONAL BREAKPOINTS
+   Allow you to break when an expression evaluates to a logical.
+
+CTRL-SHIFT-+
+   when pressed on a function will scan the current source code module
+   for that function and take you to the function declaration.
+
+DGROUP USAGE
+   MrDebug now only uses 10 bytes of precious DGROUP
+
+DISABLE ALTD() FUNCTIONS
+   Fed up with forgetting about that ALTD() in your code? MrDebug allows
+   you to disable individual ALTD()'s or all of them.
+
+DISPLAY MODE STEP FUNCTIONS
+   User-defined slots have been added to allow you to have functions
+   called when the debugger is called, and when control returns to the
+   program. This allows you to set and restore the graphics screen.
+
+DON'T SHOW INIT PROCS
+   MrDebug can now stop after the INIT routines have been called.
+
+DUMP FILE
+   MrDebug can automatically create a Dump file when your program
+   crashes detailing information about the status of the program when
+   the crash occurred, including variables, system error, workareas,
+   screen shot, the call stack, memory information, visual dgroup
+   information and source code.
+
+DUPLICATE DEFINITIONS REMOVED
+   MrDebug two duplicate definitions of __gtPreExt and __gtpostExt have
+   been removed.
+
+ERROR WINDOW
+   Allows you to capture and examine the error object when the program
+   falls over. The information in this window varies. If you have a GPF
+   then the GPF is displayed in this window, otherwise the Clipper error
+   object may be viewed from this window.
+
+EXPANSION OF #INCLUDE FILES
+   Simply put, press Ctrl-+ on a #INCLUDE line to see the .CH file
+
+FUNCTION LIST
+   This give you the ability to list all of the functions within the
+   current source code file and go directly to it. Saves paging down
+   until you find the function that you are looking for.
+
+FAST RUN MODE
+   Runs the application ignoring any break points, trace points
+
+GPF HANDLER ADDED
+   When the GPF occurs MrDebug logs the GPF details to a .GPF file. If
+   the program is stable enough to continue, then MrDebug scans the .MAP
+   file updates the .GPF file with Function name and modules name with
+   MAP A,S and then outputs the results to the Error/GPF window.
+
+HEX STRINGS
+   Strings may now be shown in Hexadecimal !!
+
+INSPECT
+   Allows you to move inspect a particular item. Move the cursor so a
+   piece of source code and if it can be evaluated it will show the
+   contents.
+
+LISTS
+   List break, trace and pass points and disabled altd()'s so that you
+   can easily remove them or disable them as well as view them.
+
+MOUSE SUPPORT
+   If for no other reason than to allow you to easily re-size and move
+   windows, but you can also mark expressions for use as trace points or
+   watch points.
+
+MrDUMP
+   A runtime crash log creation library. Similar to MrDebug's dump log
+   routines. This you may link into your final application.
+
+MrGPF
+   Map file scanner included for when you are not using MrDebug or you
+   are in graphical mode, or you want to scan a .GPF file.  MrGPF works
+   with Blinker, Causeway and Exospace and is the fastest map scanner
+   around!
+
+MEMORY/INFO
+   The memory/info window shows you lots of information about your
+   program's memory, including memory settings, DGROUP, software
+   versions and much more.
+
+NOTES
+   Notes Option added to MrDebug - Shift-Alt-N creates a note in a notes
+   file with the current line of source code, time and date and a
+   comment from you.
+
+ENHANCED OBJECT BROWSER
+   The object browser has been enhanced to allow you to view CA-Clipper
+   or Class(y) objects. It includes a class hierarchy structure that
+   will allow you to see easily which classes inherit from others.
+
+PASS POINTS
+   Allow you to mark a line of source code and have an counter
+   incremented each time that the marked line of code is executed.
+
+PROFILER
+   MrDebug has a profiler built into the debugger so that you can see
+   the slowest and fastest parts of your program and perhaps re-arrange
+   your link script or your source code.
+
+   You can even see which lines of code have not been executed.
+
+PROTECTED MODE COMPATIBLE
+   MrDebug has been designed to work in protected mode so there should
+   be no compatibility problems with Blinker, Exospace or Causeway. So
+   you know that no matter how big your application is MrDebug will be
+   there for you. You can even restart your protected mode apps
+
+REAL SCREEN USAGE
+   MrDebug takes advantage of the text mode that you are running in.  If
+   your video card supports text modes greater than 80 columns x 25 row,
+   for example 132 columns by 60 rows, then you will have plenty of
+   space for your debugging tools with a real output window for your
+   application of 80 columns x 25 rows - no screen swap, no constant
+   flicking between the debugger and the application window.
+
+REAL MODE SUPPORT
+   Over 90% of MrDebug can be overlaid with Blinker. For .RTLink users
+   we have an entertaining link script.
+
+RESTART OPTION
+   MrDebug 1.1 allows you to restart your application. Instead of having
+   to quit your application and re-run it. You may now run a module
+   called MRD and pass it the name of your application. A Restart option
+   will appear under the File menu. This works for both real mode and
+   protected mode applications.
+
+RUN MODES
+   MrDebug has the following run modes:
+
+     Go - runs the program
+     Run To Cursor - runs the program to the cursor
+     Single Step  - execute the next line of code
+     Step Over  - run the next line without stopping
+     To Next Function  - run until the next function call is made
+     To End of Function  - run until the end of the current function
+     Out of Code-block - run to line after code block
+     To Code-block  - run until codeblock
+     Fast Run - run and don't waste time!
+
+SHORT-CUT KEYS
+   MrDebug has short-cut, keystrokes for most of the operations that you
+   may use. Everything is at your fingertips. Why slow your productivity
+   down to a crawl by forcing you to use a mouse.
+
+SOURCE CODE COLOUR SYNTAX HIGHLIGHTING
+   This makes the source code easier to read and therefore quicker to
+   find things within your source code. This allows you to easily tell
+   the difference between keywords, operators, strings, numerics, #
+   directives and comments.
+
+SPLIT SCREEN MODE
+   MrDebug even has a toggle so that you can run in split screen mode
+   (80x50).
+
+STACK WINDOW
+   Shows you all the different levels of your program during the running.
+   Even shows you the remaining stack space. MrDebug evens checks for DS
+   available and warns you when getting short of memory. MethodName is
+
+   Stack and DS available checking with warnings added.  MethodName now
+   used for stack entries
+
+SYMBOL LISTS
+   This gives you the ability to view and search through the symbol
+   list(s) to work out just what exactly has been linked in, and hence
+   left out, of your program.
+
+TEXT SEARCH
+   A text search routine that allows you to search with Alt-S and search
+   again with Alt-A - and it can be case sensitive.  Text search even
+   highlights the found item.
+
+TIMING RUNS
+   Each run or step of your code can be timed to provide you with an
+   accurate reflection of how long your code will take to run.
+
+TRACKED VARIABLES
+   Allow you to watch or trace particular instances of the same variable
+   through different levels of the callstack within your application.
+
+VARIABLE WINDOW
+   Show you the variables currently available. Each may be toggled on or
+   off with Alt-L for locals, Alt-S for statics, Alt-P for publics and
+   Alt-V for privates. The first level of arrays are shown, strings can
+   be shown in Hexadecimal, string lengths are shown, variables passed
+   by ref can be viewed/edited. Local variable that have not been
+   used may be shown and variables that have been changed during the
+   last step can be highlighted.
+
+VISUAL DGROUP
+   Visual DGROUP graph now included within the Memory/Info window - you
+   can now see the different parts of DGROUP and see how much DS
+   available you have left.
+
+WORKAREA SCREEN
+   Allows you to do what you want to your data tables. If you want to
+   browse the data - no problem. If you want to edit the dat - no
+   problem. If you want to set a relation, a filter, a record lock -
+   no problem.
+
+   You can locate, goto a record, seek and expression, open or close
+   tables, view SIX driver settings or Comix settings
+
+   More like DBU than CLD!
+
+WORKAREA WINDOW
+   A real window that allows you to see each currently open table
+   with the current index and the current record. You may have this
+   on screen throughout your program debug cycle.
+
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+                                ORDERING
+                                --------
+
+To order MrDebug or for further information, please contact:
+
+In England:
+
+ Dark Black Software Limited,  Tel: +44 (0) 480 403104
+                               Fax: +44 (0) 480 471465
+                               BBS: +44 (0) 480 471465
+                             Email: MrDebug@darkblak.demon.co.uk
+                        Compuserve: 72537,31
+                               WWW: http://www.darkblak.demon.co.uk
+
+Also in the UK:
+
+ QBS Software Limited at http://www.qbss.com
+
+In Germany:
+
+  dcSoft GmbH:  Tel: +49 (0) 89 78 58 910
+                Fax: +49 (0) 89 75 58 9111
+         Compuserve: 100016,1673
+                WWW: http://www.dcsoftgmbh.com
+

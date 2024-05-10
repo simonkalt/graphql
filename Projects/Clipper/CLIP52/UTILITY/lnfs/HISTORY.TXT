@@ -1,0 +1,41 @@
+Fix/Revision history
+
+0.01 - 24th Jan 1997 - Initial version
+
+
+0.02 - 30th Jan 1997 - First public beta
+
+   Added LFNSupport() function by request of Phillip Ide.
+
+0.03 -  3rd Feb 1997 - Second public beta
+
+   Fixed _fsCurDir/_tcurdir.  The return string would most likely be
+   garbage.  I'd moved the buffer out of DGROUP but had forgot to change
+   the code for the return address.
+
+   Added some comments to the headers of the functions in FILESYS.ASM
+
+   Added _tcreat, _topen, _tdelete, _terror functions for 5.0x.  I've done
+   my best with the names.  I don't have 5.0x installed at the moment, so
+   if someone could check these out please?
+
+   Added 80286 support, which you will have to recompile the librry for.
+   Of course, you won't be able to use it on a 8088/8086 processor, but
+   who uses those nowadays anyway?  ;-)
+
+   Performed some optimizations on the code.  It appears that they used
+   macros to create the functions, so there were some unnecessary
+   instructions in there.
+
+0.04 -  7th Feb 1997 - Third public beta
+
+   Added LFNShort() function so you can convert a long filename into it's
+   equivelant 8.3 format filename.
+
+0.05 - 11th Feb 1997 - Fourth public beta
+
+   Fixed the Directory() function getting the volume label, and also
+   failing on normal 8.3 directory mode.
+
+   Oh, and the previous version was compiled with C/ASM debug info.... Now
+   it isn't....

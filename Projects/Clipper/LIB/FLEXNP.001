@@ -1,0 +1,28 @@
+#/*ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+#³                     Ganahl Software, Inc.                      ³
+#³                        (305) 735-2334                          ³
+#³                                                                ³
+#³          (c) 1990-1993 Copyright Ganahl Software, Inc.         ³
+#³                      All Rights Reserved                       ³
+#³                                                                ³
+#ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ*/
+# Sub-link file for using FlexFile's runtime version of FunckyII's NotePad
+# Do NOT include this file between a BEGINAREA and AREA structure
+
+# The following lines are needed if you DO NOT OWN the FunckyII Library
+# If you OWN FunckyII, do NOT use these LIB's and OBJ in your apps
+
+BEGINAREA
+   # This next line is the hook, to call in the runtime FunckyII NotePad
+   # C Code
+   FILE FLEXNP
+
+   # This next line is the bulk of the FunckyII NotePad Code
+   # C and Asm Code
+   LIB FLEXNP
+ENDAREA
+
+# This FunckyII NotePad code must be in the root or else ...
+# C and Asm Code
+LIB FLEXNPRT
+

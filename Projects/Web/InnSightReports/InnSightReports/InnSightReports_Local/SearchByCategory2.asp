@@ -1,0 +1,1530 @@
+<%@ Language=VBScript %>
+<!-- #include file="Data/adovbs.asp" -->
+<%Response.Expires = 0%>
+<!--#INCLUDE file="checkuser.asp"-->
+
+
+<%
+
+If Session("ScreenHeight") < 750 Then
+  GridHeight = 220 '250
+Else
+  GridHeight = 375
+End If
+
+%>
+
+
+<html>
+<head>
+<OBJECT CLASSID="clsid:5220cb21-c88d-11cf-b347-00aa00a28331" id="Microsoft_Licensed_Class_Manager_1_0"1>
+   <PARAM NAME="LPKPath" VALUE="innsight.LPK">
+</OBJECT>
+
+<meta name="VI60_defaultClientScript" content="VBScript">
+<meta NAME="GENERATOR" Content="Microsoft Visual Studio 6.0">
+
+<style>
+<!--
+.SelectFont     { font-family: Tahoma; font-size: 11 }
+-->
+</style>
+
+<%
+
+	Set cnSQL = Server.CreateObject("ADODB.Connection")
+	Set rsSQL = Server.CreateObject("ADODB.Recordset")
+	Set rsSQLCount = Server.CreateObject("ADODB.Recordset")
+	Set rsLocationsUnique = Server.CreateObject("ADODB.Recordset")
+  
+	cnSQL.Open Application("sqlInnSight_ConnectionString"), Application("sqlInnSight_RuntimeUsername"), Application("sqlInnSight_RuntimePassword")
+
+	'Get List of Unique Locations for Unique Array
+	rsLocationsUnique.Open "sp_LocationsUnique " & Session("CompanyID"), cnSQL,adOpenKeyset,adLockReadOnly
+
+	Select Case Request.QueryString("Sort")
+		Case "Name"
+			rsSQL.Open "sp_GetLocationsByCat_Name " & Session("CompanyID"),cnSQL,adOpenKeyset,adLockReadOnly
+		Case "Stars"
+			rsSQL.Open "sp_GetLocationsByCat_Stars " & Session("CompanyID"),cnSQL,adOpenKeyset,adLockReadOnly
+		Case Else
+			rsSQL.Open "sp_GetLocationsByCat_Price " & Session("CompanyID"),cnSQL,adOpenKeyset,adLockReadOnly
+	End Select
+
+	' ATTN JOSEPH:  Changed the SQL SP name as the old name is not found in new server, wbwd.net!
+	'Server restore fixed that problem.
+  
+%>
+
+
+<%
+	Set rsCats = Server.CreateObject("ADODB.Recordset")
+	Set rsSubCats = Server.CreateObject("ADODB.Recordset")
+	Set rsSubCatsAll = Server.CreateObject("ADODB.Recordset")
+  
+	Set rsCats = cnSQL.Execute("sp_GetAllCats " & Session("CompanyID"))
+	Set rsSubCats = cnSQL.Execute("sp_GetAllSubCats " & Session("CompanyID"))
+	Set rsSubCatsAll = cnSQL.Execute("sp_GetAllSubCats_All " & Session("CompanyID"))
+%>
+
+<SCRIPT LANGUAGE=vbscript>
+<!--
+
+Dim MaxColUnique			' Number of columns
+Dim MaxRowUnique			' Number of rows
+Dim UniqueArray()			' Array to store the data
+Dim UniqueArrayClone()		' Original Copy of Array
+
+Public Function N2Z(pvarIn)
+	If IsNull(pvarIn) Then
+		N2Z = 0
+	Else
+		If IsNumeric(pvarIn) Then
+			N2Z = pvarIn
+		Else
+			N2Z = 0
+		End If
+	End If
+End Function
+
+Public Sub InitializeUniqueArray()
+	For intCnt1 = lbound(UniqueArrayClone,1) to ubound(UniqueArrayClone,1)
+		For intCnt2 = lbound(UniqueArrayClone,2) to ubound(UniqueArrayClone,2)
+			UniqueArray(intCnt1, intCnt2) = UniqueArrayClone(intCnt1, intCnt2)
+		Next
+	Next
+End Sub
+
+Public Function OkayToInsert( pintLocationID)
+Dim intArray
+Dim intLocationID
+
+	intLocationID = cInt(N2Z(pintLocationID))
+	
+	OkayToInsert = True
+	
+	For intCnt = LBound(UniqueArray,2) to UBound(UniqueArray,2)
+		intArray = cInt(N2Z(UniqueArray(0, intCnt)))
+		If intArray = intLocationID Then
+			If UniqueArray(1,intCnt) = True Then
+				OkayToInsert = False
+				Exit For
+			Else
+				OkayToInsert = True
+				UniqueArray(1,intCnt) = True
+				Exit For
+			End If
+		End If
+	Next
+End Function
+
+
+
+    MaxColUnique = 2
+    MaxRowUnique = <%=rsLocationsUnique.Recordcount%>
+
+    If MaxRowUnique > 0 Then
+
+        ' If MaxRow = 0, then (MaxRow - 1) equals -1. This
+
+        ' causes an error in the statement below, so we
+
+        ' handle this special case in the Else clause.
+
+        ReDim UniqueArray(MaxColUnique - 1, MaxRowUnique - 1)
+        ReDim UniqueArrayClone(MaxColUnique - 1, MaxRowUnique - 1)
+    Else
+        ReDim UniqueArray(MaxColUnique - 1, 0)
+        ReDim UniqueArrayClone(MaxColUnique - 1, 0)
+    End If
+
+    
+
+<%
+	J = 0
+    Do While Not rsLocationsUnique.EOF
+    %>
+      UniqueArray(0, <%=J%>) = <%=rsLocationsUnique.Fields("LocationID")%>
+      UniqueArray(1, <%=J%>) = False
+      <%
+      J = J + 1
+      rsLocationsUnique.MoveNext
+    Loop
+    'Keep Copy of Original
+    %>
+
+	For intCnt1 = lbound(UniqueArray,1) to ubound(UniqueArray,1)
+		For intCnt2 = lbound(UniqueArray,2) to ubound(UniqueArray,2)
+			UniqueArrayClone(intCnt1, intCnt2) = UniqueArray(intCnt1, intCnt2)
+		Next
+	Next
+    
+    
+
+
+-->
+</SCRIPT>
+
+<script ID="clientEventHandlersVBS" LANGUAGE="vbscript">
+<!--
+Dim MaxCol          ' Number of columns
+Dim MaxRow          ' Number of rows
+Dim ID_COL			' CAT_ID
+Dim ID_ONLY_COL		' ID_ONLY
+Dim GridArray()		' Array to store the data
+Dim GridArrayClone()	' Original Copy of Array
+
+
+
+
+    MaxCol = 14
+    MaxRow = <%=rsSQL.Recordcount%>
+    ID_COL = MaxCol - 1
+    ID_ONLY_COL = MaxCol - 2
+
+    If MaxRow > 0 Then
+
+        ' If MaxRow = 0, then (MaxRow - 1) equals -1. This
+
+        ' causes an error in the statement below, so we
+
+        ' handle this special case in the Else clause.
+
+        ReDim GridArray(MaxCol - 1, MaxRow - 1)
+
+        ReDim GridArrayClone(MaxCol - 1, MaxRow - 1)
+    Else
+
+        ReDim GridArray(MaxCol - 1, 0)
+        ReDim GridArrayClone(MaxCol - 1, 0)
+
+    End If
+
+    
+
+<%
+	J = 0
+    Do While Not rsSQL.EOF
+    %>
+      GridArray(0, <%=J%>) = False
+      GridArray(1, <%=J%>) = "<%=rsSQL.Fields("CompanyName")%>"
+      GridArray(2, <%=J%>) = "<%=rsSQL.Fields("Street")%>"
+      GridArray(3, <%=J%>) = "<%=rsSQL.Fields("City")%>"
+      GridArray(4, <%=J%>) = "<%=rsSQL.Fields("State")%>"
+'      GridArray(5, <%=J%>) = "<%=rsSQL.Fields("Phone")%>"
+      GridArray(5, <%=J%>) = "<%=FormatPhone(rsSQL.Fields("Phone"))%>"
+      <% 
+		Dim strDirMap
+		Dim strCPNText
+		
+        if (rsSQL.Fields("DirectionsMap") <> "") then  
+			strDirMap = "MAP"
+        else
+			strDirMap = ""
+        end if   
+        
+        if (rsSQL.Fields("CouponText") <> "") then  
+			strCPNText = "CPN"
+        else
+			strCPNText = ""
+        end if   
+      %>
+      GridArray(6, <%=J%>) = "<%=strDirMap%>" ' "<%=rsSQL.Fields("DirectionsMap")%>"
+      GridArray(7, <%=J%>) = "<%=strCPNText%>" ' "<%=rsSQL.Fields("CouponText")%>"
+      GridArray(8, <%=J%>) = "<%=rsSQL.Fields("MenuWebsite")%>"
+      GridArray(9, <%=J%>) = "<%=rsSQL.Fields("Website")%>"
+      GridArray(10, <%=J%>) = "<%=rsSQL.Fields("HotelRating")%>"
+      GridArray(11, <%=J%>) = "<%=rsSQL.Fields("CostRating")%>"
+
+      GridArray(ID_ONLY_COL, <%=J%>) = "<%=rsSQL.Fields("LocationID")%>"
+      GridArray(ID_COL, <%=J%>) = "<%=rsSQL.Fields("CategoryID") & "_" & rsSQL.Fields("SubCategoryID") & "_" & rsSQL.Fields("LocationID")%>"
+      
+      <%
+      J = J + 1
+      rsSQL.MoveNext
+    Loop
+    'Keep Copy of Original
+    %>
+
+	For intCnt1 = lbound(GridArray,1) to ubound(GridArray,1)
+		For intCnt2 = lbound(GridArray,2) to ubound(GridArray,2)
+			GridArrayClone(intCnt1, intCnt2) = GridArray(intCnt1, intCnt2)
+		Next
+	Next
+    
+    
+    <%
+%>
+
+Function StripCat(pstrVal)
+  
+  intPosStart = InStr(pstrVal,"_")
+  
+  'MsgBox "String: " & pstrVal
+  'MsgBox "intPosStop: " & intPosStop
+  'MsgBox "Len: " & Len(pstrVal)-intPosStop
+  
+  StripCat = Right(pstrVal,Len(pstrVal)- intPosStart)
+  
+End Function
+
+
+
+Sub cboCat_onchange
+	'MsgBox "Cat: " & window.cboCat.options(window.cboCat.selectedIndex).value
+
+	InitializeUniqueArray
+	'Load Sub Cat Combo
+	'Clear Out
+	For intCnt = window.cboSubCat.length - 1 to 0 Step -1
+		window.cboSubCat.remove(intCnt)
+	Next	
+	
+	'Populate
+	intLen = Len(window.cboCat.options(window.cboCat.selectedIndex).value)
+	strText = window.cboCat.options(window.cboCat.selectedIndex).value
+	
+	'Load Default
+	Set objOpt = document.createElement("option")
+	objOpt.Value = "0_0"
+	objOpt.Text = "All"
+	window.cboSubCat.options.add(objOpt)
+
+	If strText = "0" Then
+		'Add All SubCats
+		For intCnt = 0 to window.cboSubCatsVis_All.length - 1
+			Set objOpt = document.createElement("option")
+			objOpt.Value = StripCat(window.cboSubCatsVis_All.options(intCnt).value)
+			objOpt.Text = window.cboSubCatsVis_All.options(intCnt).text
+			window.cboSubCat.options.add(objOpt)
+		Next
+	Else
+		For intCnt = 0 to window.cboSubCatsVis.length - 1
+			If strText = UCase(Left(window.cboSubCatsVis.options(intCnt).value, intLen)) Then
+				Set objOpt = document.createElement("option")
+				objOpt.Value = StripCat(window.cboSubCatsVis.options(intCnt).value)
+				objOpt.Text = window.cboSubCatsVis.options(intCnt).text
+				window.cboSubCat.options.add(objOpt)
+			End If
+		Next
+	End If	
+
+	'Load Visible Locations
+	intLen = Len(window.cboCat.options(window.cboCat.selectedIndex).value)
+	strText = window.cboCat.options(window.cboCat.selectedIndex).value
+
+	'Clear Out
+	ReDim GridArray(MaxCol - 1, UBound(GridArrayClone,2) - 1)
+	 
+	If strText = "0" Then
+		'All
+		intRowCount = 0
+		For intCnt2 = LBound(GridArrayClone,2) to (UBound(GridArrayClone,2)-1)
+			If OkayToInsert(GridArrayClone(ID_ONLY_COL, intCnt2)) Then
+				For intCnt1 = LBound(GridArrayClone,1) to UBound(GridArrayClone,1)
+					GridArray(intCnt1, intRowCount) = GridArrayClone(intCnt1, intCnt2)
+				Next
+				intRowCount = intRowCount + 1
+			End If
+		Next
+	Else
+		intRowCount = 0
+		For intCnt2 = LBound(GridArrayClone,2) to UBound(GridArrayClone,2)
+			If strText = UCase(Left(GridArrayClone(ID_COL, intCnt2), intLen)) Then
+				If OkayToInsert(GridArrayClone(ID_ONLY_COL, intCnt2)) Then
+					For intCnt1 = LBound(GridArrayClone,1) to UBound(GridArrayClone,1)
+						GridArray(intCnt1, intRowCount) = GridArrayClone(intCnt1, intCnt2)
+					Next
+					intRowCount = intRowCount + 1
+				End If
+			End If
+		Next
+	End If
+
+	If intRowCount > 0 Then
+		Redim Preserve GridArray(MaxCol - 1, intRowCount - 1)
+	Else
+		Redim Preserve GridArray(MaxCol - 1, 0)
+	End If
+	
+	MaxRow = intRowCount
+	window.TDBGrid1.Refresh
+	
+End Sub
+
+Sub cboSubCat_onchange
+	'MsgBox "SubCat: " & window.cboSubCat.options(window.cboSubCat.selectedIndex).value
+
+	If window.cboSubCat.options(window.cboSubCat.selectedIndex).value =  "0_0" Then
+		cboCat_onchange
+		Exit Sub
+	End If
+	
+	InitializeUniqueArray
+
+	'Load Visible Locations
+	intLen = Len(window.cboSubCat.options(window.cboSubCat.selectedIndex).value)
+	strText = window.cboSubCat.options(window.cboSubCat.selectedIndex).value
+
+	'Clear Out
+	
+	ReDim GridArray(MaxCol - 1, UBound(GridArrayClone,2) - 1)
+
+	intRowCount = 0
+	For intCnt2 = LBound(GridArrayClone,2) to UBound(GridArrayClone,2)
+		If strText = UCase(Left(StripCat(GridArrayClone(ID_COL, intCnt2)), intLen)) Then
+			If OkayToInsert(GridArrayClone(ID_ONLY_COL, intCnt2)) Then
+				For intCnt1 = LBound(GridArrayClone,1) to UBound(GridArrayClone,1)
+					GridArray(intCnt1, intRowCount) = GridArrayClone(intCnt1, intCnt2)
+				Next
+				intRowCount = intRowCount + 1
+			End If
+		End If
+	Next
+	If intRowCount > 0 Then
+		Redim Preserve GridArray(MaxCol - 1, intRowCount - 1)
+	Else
+		Redim Preserve GridArray(MaxCol - 1, 0)
+	End If
+	
+	MaxRow = intRowCount
+	window.TDBGrid1.Refresh
+	
+End Sub
+
+Sub txtSelect_onkeyup
+
+	Do While window.TDBGrid1.SelBookmarks.Count > 0
+		window.TDBGrid1.SelBookmarks.Remove (window.TDBGrid1.SelBookmarks.Count - 1)
+	Loop
+	
+	intLen = Len(window.txtSelect.value)
+	strText = UCase(Trim(window.txtSelect.value))
+	For intCnt = 0 to UBound(GridArray, 2)
+		If strText = UCase(Left(GridArray(1,intCnt), intLen)) Then
+			window.TDBGrid1.SelBookmarks.Add CStr(intCnt)
+			window.TDBGrid1.MoveRelative intCnt, CStr(0)
+			Exit For
+		End If
+	Next	
+
+End Sub
+
+Sub cmdAddItem_onclick
+	Set objOpt = document.createElement("option")
+	objOpt.Value = window.lstLocations.options(window.lstLocations.selectedIndex).value
+	objOpt.Text = window.lstLocations.options(window.lstLocations.selectedIndex).text
+	window.lstSelected.options.add(objOpt)
+End Sub
+
+Sub cmdRemoveItem_onclick
+  window.lstSelected.remove(window.lstSelected.selectedIndex)
+End Sub
+
+
+Sub TDBGrid1_UnboundGetRelativeBookmark(StartLocation, ByVal offset, NewLocation, ApproximatePosition)
+' TDBGrid1 calls this routine each time it needs to
+
+' reposition itself. StartLocation is a bookmark
+
+' supplied by the grid to indicate the "current"
+
+' position -- the row we are moving from. Offset is
+
+' the number of rows we must move from StartLocation
+
+' in order to arrive at the desired destination row.
+
+' A positive offset means the desired record is after
+
+' the StartLocation, and a negative offset means the
+
+' desired record is before StartLocation.
+
+' If StartLocation is NULL, then we are positioning
+
+' from either BOF or EOF. Once we determine the
+
+' correct index for StartLocation, we will simply add
+
+' the offset to get the correct destination row.
+
+' GetRelativeBookmark already does all of this, so we
+
+' just call it here.
+
+    NewLocation = GetRelativeBookmark(StartLocation, offset)
+
+' If we are on a valid data row (i.e., not at BOF or
+
+' EOF), then set the ApproximatePosition (the ordinal
+
+' row number) to improve scroll bar accuracy. We can
+
+' call IndexFromBookmark to do this.
+
+    If Not IsNull(NewLocation) Then
+
+       ApproximatePosition = IndexFromBookmark(NewLocation, 0)
+
+    End If
+
+
+
+
+End Sub
+
+Sub TDBGrid1_UnboundReadData(ByVal RowBuf, StartLocation, ByVal ReadPriorRows)
+' UnboundReadData is fired by an unbound grid whenever
+
+' it requires data for display. This event will fire
+
+' when the grid is first shown, when Refresh or ReBind
+
+' is used, when the grid is scrolled, and after a
+
+' record in the grid is modified and the user commits
+
+' the change by moving off of the current row. The
+
+' grid fetches data in "chunks", and the number of rows
+
+' the grid is asking for is given by RowBuf.RowCount.
+
+' RowBuf is the row buffer where you place the data and
+
+' the bookmarks for the rows that the grid is requesting
+
+' to display. It will also hold the number of rows that
+
+' were successfully supplied to the grid.
+
+' StartLocation is a bookmark which specifies the row
+
+' before or after the desired data, depending on the
+
+' value of ReadPriorRows. If we are reading rows after
+
+' StartLocation (ReadPriorRows = False), then the first
+
+' row of data the grid wants is the row after
+
+' StartLocation, and if we are reading rows before
+
+' StartLocation (ReadPriorRows = True) then the first
+
+' row of data the grid wants is the row before
+
+' StartLocation.
+
+' ReadPriorRows is a boolean value indicating whether
+
+' we are reading rows before (ReadPriorRows = True) or
+
+' after (ReadPriorRows = False) StartLocation.
+
+
+    Dim Bookmark
+
+    Dim I, RelPos
+
+    Dim J, RowsFetched
+
+    
+
+' Get a bookmark for the start location
+
+    Bookmark = StartLocation
+
+        
+
+    If ReadPriorRows Then
+
+        RelPos = -1 ' Requesting data in rows prior to
+
+                    ' StartLocation
+
+    Else
+
+        RelPos = 1  ' Requesting data in rows after
+
+                    ' StartLocation
+
+    End If
+
+    
+
+    RowsFetched = 0
+
+    For I = 0 To RowBuf.RowCount - 1
+
+        ' Get the bookmark of the next available row
+
+        Bookmark = GetRelativeBookmark(Bookmark, RelPos)
+
+    
+
+        ' If the next row is BOF or EOF, then stop
+
+        ' fetching and return any rows fetched up to this
+
+        ' point.
+
+        If IsNull(Bookmark) Then Exit For
+
+    
+
+        ' Place the record data into the row buffer
+
+        For J = 0 To RowBuf.ColumnCount - 1
+            'Debug.Print I, J, GetUserData(Bookmark, J)
+            RowBuf.Value(I, J) = GetUserData(Bookmark, J)
+
+        Next
+
+    
+
+        ' Set the bookmark for the row
+
+        RowBuf.Bookmark(I) = Bookmark
+
+    
+
+        ' Increment the count of fetched rows
+
+        RowsFetched = RowsFetched + 1
+
+    Next
+
+    
+
+' Tell the grid how many rows we fetched
+
+    RowBuf.RowCount = RowsFetched
+
+End Sub
+
+Sub TDBGrid1_UnboundWriteData(ByVal RowBuf, WriteLocation)
+  GridArray(0, WriteLocation) = Not GridArray(0, WriteLocation)
+End Sub
+
+Sub TDBGrid1_PostEvent(ByVal MsgId)
+Select Case MsgId
+
+    Case 0
+
+        Exit Sub
+
+    Case 1
+
+        'Data1.Refresh
+
+    Case 2
+
+        ' Handle Mouseclick Event
+        If window.TDBGrid1.Col = 1 Then
+          'MsgBox "handle go to web: " & GridArray(TDBGrid1.Col,window.TDBGrid1.Bookmark)
+          If Len(GridArray(TDBGrid1.Col,window.TDBGrid1.Bookmark)) > 0 Then
+            'window.location.href = "http://" & GridArray(TDBGrid1.Col,window.TDBGrid1.Bookmark)
+            MsgBox "Show Location Report"
+          End If
+        End If
+
+        If window.TDBGrid1.Col = 8 Then
+          'MsgBox "handle go to web: " & GridArray(TDBGrid1.Col,window.TDBGrid1.Bookmark)
+          If Len(GridArray(TDBGrid1.Col,window.TDBGrid1.Bookmark)) > 0 Then
+            'window.location.href = "http://" & GridArray(TDBGrid1.Col,window.TDBGrid1.Bookmark)
+
+            'Changed by Joseph 5/6/01
+            strURL = "http://" & GridArray(TDBGrid1.Col,window.TDBGrid1.Bookmark)
+            window.open strURL,null,"height=200,width=400,status=yes,toolbar=no,menubar=no,location=no"
+          End If
+        End If
+        If window.TDBGrid1.Col = 9 Then
+          'MsgBox "handle go to web: " & GridArray(TDBGrid1.Col,window.TDBGrid1.Bookmark)
+          If Len(GridArray(TDBGrid1.Col,window.TDBGrid1.Bookmark)) > 0 Then
+            'window.location.href = "http://" & GridArray(TDBGrid1.Col,window.TDBGrid1.Bookmark)
+            
+            'Changed by Joseph 5/6/01
+            strURL = "http://" & GridArray(TDBGrid1.Col,window.TDBGrid1.Bookmark)
+            window.open strURL,null,"height=200,width=400,status=yes,toolbar=no,menubar=no,location=no"
+
+          End If
+        End If
+
+        If window.TDBGrid1.Col = 0 Then
+			window.TDBGrid1.Update
+        End If
+
+    Case 3
+        'Debug.Print "Update "
+        window.TDBGrid1.Update
+    Case 4
+
+	Case 7
+		'Added by Joseph 5/6/01
+		'Size Columns
+        'Width Problem
+        dblWidthSum = 0
+
+        For intCnt = 0 To window.TDBGrid1.Columns.Count - 1
+            'window.tdbGrid1.Columns(intCnt).Style("VerticalAlignment") = 2
+
+            window.TDBGrid1.Columns(intCnt).AllowSizing = True
+            window.TDBGrid1.Columns(intCnt).AutoSize
+            dblWidthSum = dblWidthSum + window.TDBGrid1.Columns(intCnt).Width
+            window.TDBGrid1.Columns(intCnt).AllowSizing = False
+
+ 			window.TDBGrid1.Columns(intCnt).style.VerticalAlignment = 2
+			
+        Next 
+        
+        'The col4 size is to add the state width back in since it's invisible.
+        'Joseph 5/6/01
+		window.TDBGrid1.Columns(1).Width = window.TDBGrid1.Columns(1).Width + window.TDBGrid1.Columns(4).Width/2 +  (window.TDBGrid1.Width - dblWidthSum)
+        
+
+        dblWidthSum = 0
+		
+
+End Select
+
+End Sub
+
+Sub TDBGrid1_Click
+  TDBGrid1.PostMsg 2
+End Sub
+
+Sub TDBGrid1_BeforeUpdate(Cancel)
+  window.TDBGrid1.PostMsg 3
+End Sub
+
+Sub button6_onclick
+Dim intRnd
+  Do While window.TDBGrid1.SelBookmarks.Count > 0
+    window.TDBGrid1.SelBookmarks.Remove (window.TDBGrid1.SelBookmarks.Count - 1)
+  Loop
+  intRnd = UBound(GridArray, 2)
+  Randomize
+  intRnd = cInt((intRnd - 0) * Rnd + 0)
+
+
+  window.TDBGrid1.SelBookmarks.Add CStr(intRnd)
+  window.TDBGrid1.MoveRelative intRnd, CStr(0)
+End Sub
+
+Sub TDBGrid1_HeadClick(ByVal ColIndex)
+  Select Case colIndex
+    Case 1
+		window.location.href = "SearchByCategory2.asp?Sort=Name"
+	Case 2
+		window.location.href = "SearchByCategory2.asp?Sort=Address"
+  End Select
+End Sub
+
+
+Sub cmdViewLocation_onclick
+	Dim strLocationList
+	Dim intSelCnt 
+	
+	intSelCnt = 0
+
+	For intCnt = Lbound(GridArray,2) to UBound(GridArray,2)
+		If GridArray(0, intCnt) <> False Then
+			If intSelCnt = 0 Then
+				strLocationList = strLocationList & GridArray(ID_ONLY_COL,intCnt)
+			Else
+				strLocationList = strLocationList & "," & GridArray(ID_ONLY_COL,intCnt)
+			End If
+			intSelCnt = intSelCnt + 1
+		End If
+	Next
+	
+	If intSelCnt = 0 Then
+		MsgBox "You must select at least one record to view a report."
+	Else
+		window.frmViewLocation.txtViewLocationList.value = strLocationList
+		window.frmViewLocation.submit
+		'window.location.href = "ReportLocation.asp?LocationIDList=" & strLocationList
+	End If
+End Sub
+
+Sub cmdPrintLocation_onclick
+	Dim strLocationList
+	Dim intSelCnt 
+	
+	intSelCnt = 0
+
+	For intCnt = Lbound(GridArray,2) to UBound(GridArray,2)
+		If GridArray(0, intCnt) <> False Then
+			If intSelCnt = 0 Then
+				strLocationList = strLocationList & GridArray(ID_ONLY_COL,intCnt)
+			Else
+				strLocationList = strLocationList & "," & GridArray(ID_ONLY_COL,intCnt)
+			End If
+			intSelCnt = intSelCnt + 1
+		End If
+	Next
+	
+	If intSelCnt = 0 Then
+		MsgBox "You must select at least one record to view a report."
+	Else
+		window.frmPrintLocation.txtPrintLocationList.value = strLocationList
+		window.frmPrintLocation.submit
+		'window.location.href = "ReportLocation.asp?LocationIDList=" & strLocationList
+	End If
+End Sub
+
+Sub cmdEMailLocation_onclick
+	Dim strLocationList
+	Dim intSelCnt 
+	
+	intSelCnt = 0
+
+	For intCnt = Lbound(GridArray,2) to UBound(GridArray,2)
+		If GridArray(0, intCnt) <> False Then
+			If intSelCnt = 0 Then
+				strLocationList = strLocationList & GridArray(ID_Col,intCnt)
+			Else
+				strLocationList = strLocationList & "," & GridArray(ID_Col,intCnt)
+			End If
+			intSelCnt = intSelCnt + 1
+		End If
+	Next
+	
+	If intSelCnt = 0 Then
+		MsgBox "You must select at least one record to view a report."
+	Else
+		window.frmViewLocation.txtViewLocationList.value = strLocationList
+		window.frmViewLocation.submit
+		'window.location.href = "ReportLocation.asp?LocationIDList=" & strLocationList
+	End If
+End Sub
+
+
+Sub cmdViewSummary_onclick
+	Dim strLocationList
+	Dim intSelCnt 
+	
+	intSelCnt = 0
+
+	For intCnt = Lbound(GridArray,2) to UBound(GridArray,2)
+		If GridArray(0, intCnt) <> False Then
+			If intSelCnt = 0 Then
+				strLocationList = strLocationList & GridArray(ID_ONLY_COL,intCnt)
+			Else
+				strLocationList = strLocationList & "," & GridArray(ID_ONLY_COL,intCnt)
+			End If
+			intSelCnt = intSelCnt + 1
+		End If
+	Next
+	
+	If intSelCnt = 0 Then
+		MsgBox "You must select at least one record to view a report."
+	Else
+		window.frmViewSummary.txtViewSummaryList.value = strLocationList
+		window.frmViewSummary.submit
+	End If
+
+End Sub
+
+Sub cmdPrintSummary_onclick
+	Dim strLocationList
+	Dim intSelCnt 
+	
+	intSelCnt = 0
+
+	For intCnt = Lbound(GridArray,2) to UBound(GridArray,2)
+		If GridArray(0, intCnt) <> False Then
+			If intSelCnt = 0 Then
+				strLocationList = strLocationList & GridArray(ID_ONLY_COL,intCnt)
+			Else
+				strLocationList = strLocationList & "," & GridArray(ID_ONLY_COL,intCnt)
+			End If
+			intSelCnt = intSelCnt + 1
+		End If
+	Next
+	
+	If intSelCnt = 0 Then
+		MsgBox "You must select at least one record to view a report."
+	Else
+		window.frmPrintSummary.txtPrintSummaryList.value = strLocationList
+		window.frmPrintSummary.submit
+	End If
+
+End Sub
+
+Sub cmdMainMenu_onclick
+	window.location.href = "Switchboard3.asp"
+End Sub
+
+
+Sub chkSelectAll_onclick
+	Dim bSelect
+
+	if (document.forms("frmSelectAll").item("chkSelectAll").checked = true) then
+		bSelect = true
+	else
+		bSelect = false
+	end if
+    
+	For intCnt = Lbound(GridArray,2) to UBound(GridArray,2)
+	    GridArray(0, intCnt) = bSelect
+	Next
+
+	window.TDBGrid1.Refresh
+End Sub
+
+
+Sub chkUnSelectAll_onclick
+	Dim bSelect
+
+	if (document.forms("frmSelectAll").item("chkUnSelectAll").checked = true) then
+		bSelect = false
+	else
+		bSelect = true
+	end if
+    
+	For intCnt = Lbound(GridArray,2) to UBound(GridArray,2)
+	    GridArray(0, intCnt) = bSelect
+	Next
+
+	window.TDBGrid1.Refresh
+End Sub
+
+Public Sub UnSelectAll
+	Dim bSelect
+
+	bSelect = false
+    
+	For intCnt = Lbound(GridArray,2) to UBound(GridArray,2)
+	    GridArray(0, intCnt) = bSelect
+	Next
+
+	window.TDBGrid1.Refresh
+End Sub
+
+Sub window_onload
+	window.TDBGrid1.PostMsg 7
+End Sub
+
+'Added by Joseph 5/6/01
+Sub cboLetterhead_onchange
+	window.frmViewLocation.txtLetterHead.value = window.frmLetterHead.cboLetterhead.options(window. frmLetterHead.cboLetterhead.selectedIndex).value
+	window.frmViewSummary.txtLetterHead.value = window.frmLetterHead.cboLetterhead.options(window. frmLetterHead.cboLetterhead.selectedIndex).value
+End Sub
+
+
+-->
+</script>
+
+<title>Search By Category</title>
+</head>
+
+<body vLink="black" aLink="black" link="black" bgColor="silver" leftMargin="0" topMargin="0" marginwidth="0" marginheight="0">
+
+<!--#include file = "Header.inc" ---> 
+
+<style>
+<!--
+.SelectFont     { font-family: Tahoma; font-size: 11 }
+-->
+</style>
+
+<table width=772 border="0">
+	<tr valign="bottom">
+		<td height=30> <!--Change this number to change distance from banner-->
+			<div style="z-index:0; position:static; visibility:visible">
+				<p class="SelectFont">
+				&nbsp;&nbsp;Category:&nbsp;
+				<select id="cboCat" name="cboCat" style="BACKGROUND-COLOR: #F9D568; font-family: Tahoma; font-size: 11; width: 298px">
+					<option value="0">All</option>
+					<%
+						Do While Not rsCats.EOF
+					%>
+							<option value="<%=rsCats.Fields("CategoryID")%>"><%=rsCats.Fields("Category")%></option>
+					<%
+							rsCats.MoveNext
+						Loop
+					%>
+				</select>
+				&nbsp;&nbsp;&nbsp;&nbsp;Sub-Category:&nbsp;
+				<select id="cboSubCat" name="cboSubCat" style="BACKGROUND-COLOR: #F9D568; font-family: Tahoma; font-size: 11; width: 299px">
+					<option value="0_0">All</option>
+				</select>
+			</div>
+			<div style="z-index:1; position:absolute; top:0; left:0; width: 0; height: 0; visibility: hidden">
+				<select id="cboSubCatsVis" name="cboSubCatsVis" style="visibility: hidden">
+					<%
+						Do While Not rsSubCats.EOF
+					%>
+							<option value="<%=rsSubCats.Fields("CategoryID") & "_" & rsSubCats.Fields("SubCategoryID")%>"><%=rsSubCats.Fields("SubCategory")%></option>
+					<%
+							rsSubCats.MoveNext
+						Loop
+					%>
+				</select>
+				<select id="cboSubCatsVis_All" name="cboSubCatsVis_All" style="VISIBILITY: hidden">
+					<%
+						Do While Not rsSubCatsAll.EOF
+					%>
+							<option value="<%=rsSubCatsAll.Fields("CategoryID") & "_" & rsSubCatsAll.Fields("SubCategoryID")%>"><%=rsSubCatsAll.Fields("SubCategory")%></option>
+					<%
+							rsSubCatsAll.MoveNext
+						Loop
+					%>
+				</select>
+			</div>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<object id="TDBGrid1" style="LEFT: 0px; WIDTH: 750px; TOP: 0px; HEIGHT: <%=GridHeight%>px"  codebase="../../tdbg6.cab" classid="clsid:00028CD1-0000-0000-0000-000000000046" data="data:application/x-oleobject;base64,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AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//////////8AAAAABgAAAAEAAAAAAAAAAAAAAAQAAAANAACADgAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//////////AAAAAAcAAAABAAAAAAAAAAAAAAAEAAAABQAAgAgAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//////////wAAAAAIAAAAAQAAAAAAAAAAAAAABAAAAAgAAIAFAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//////////8AAAAACQAAAAEAAAAAAAAAAAAAAAQAAAAA//8ACAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//////////AAAAAAoAAAABAAAAAAAAAAAAAAAEAAAABQAAgAgAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//////////wAAAAALAAAAAQAAAAAAAAAAAAAABAAAAAUAAIAIAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//////////8AAAAADAAAAAIAAAAAAAAAAAAAABQAAAAPAACAEgAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//////////AAAAAA0AAAADAAAAAAAAAAAAAAAUAAAADwAAgBIAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//////////wAAAAAOAAAABQAAAAAAAAAAAAAAFAAAAA8AAIASAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//////////8AAAAADwAAAAcAAAAAAAAAAAAAAAQAAAAFAACACAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//////////AAAAABAAAAAGAAAAAAAAAAAAAAAEAAAADQAAgA4AAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//////////wAAAAARAAAACAAAAAAAAAAAAAAABAAAAAgAAIAFAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//////////8AAAAAEgAAAAkAAAAAAAAAAAAAAAQAAAAA//8ACAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//////////AAAAABMAAAAKAAAAAAAAAAAAAAAEAAAABQAAgAgAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//////////wAAAAAUAAAABAAAAAAAAAAAAAAAEQAAAA8AAIASAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//////////8AAAAAFQAAAAwAAAAAAAAAAAAAABQAAAAPAACAEgAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//////////AAAAABYAAAANAAAAAAAAAAAAAAAUAAAADwAAgBIAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//////////wAAAAAXAAAADwAAAAAAAAAAAAAABAAAAAUAAIAIAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//////////8AAAAAGAAAAAsAAAAAAAAAAAAAAAQAAAAFAACACAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//////////AAAAABkAAAAMAAAAAAAAAAAAAAAUAAAADwAAgBIAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//////////wAAAAAaAAAADQAAAAAAAAAAAAAAFAAAAA8AAIASAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//////////8AAAAAGwAAAA8AAAAAAAAAAAAAAAQAAAAFAACACAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//////////AAAAABwAAAALAAAAAAAAAAAAAAAEAAAABQAAgAgAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//////////wAAAAAdAAAAAAAAAD8IAP8AAAAABAAAAAUAAIAIAACAOQMAAFRhaG9tYQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//////////8AAAAAHgAAAB0AAADAAgEAAAIAABQAAAAPAACAEgAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//////////AAAAAB8AAAAdAAAAwAABAAAAAAAUAAAADwAAgBIAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//////////wAAAAAgAAAAHQAAAMAAAAAAAAAABAAAAA0AAIAOAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//////////8AAAAAIQAAAB4AAAAAAQAAAAAAABEAAAAPAACAEgAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//////////AAAAACIAAAAdAAAAwAAAAAAAAAAEAAAACAAAgAUAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//////////wAAAAAjAAAAHQAAAIAAAAAAAAAABAAAAAD//wAIAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//////////8AAAAAJAAAAB0AAAAAAAAAAAAAAAQAAAAFAACACAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//////////AAAAAB0AAAAAAAAAAAAAAAAAAAAAAAAA//////////8BAAAAAAAAAAAAAAABAAAA/v///wQAAAAAAAAAAAAAAAUAAAD9////AgAAAAAAAAAAAAAAAgAAAOr///8DAAAAAAAAAAAAAAADAAAA/P///wUAAAAAAAAAAAAAAP/////7////BgAAAAAAAAAAAAAABAAAAPr///8HAAAAAAAAAAAAAAD/////8f///wgAAAAAAAAAAAAAAAYAAADv////CQAAAAAAAAAAAAAABwAAAO7///8KAAAAAAAAAAAAAAAIAAAA+f///wsAAAABAAAAAAAAAP/////r////FAAAAAEAAAAAAAAA//////j///8MAAAAAQAAAAAAAAD/////6f///w0AAAABAAAAAAAAAP/////3////DgAAAAEAAAAAAAAA//////b///8QAAAAAQAAAAAAAAD/////9f///w8AAAABAAAAAAAAAP/////w////EQAAAAEAAAAAAAAA/////+3///8SAAAAAQAAAAAAAAD/////7P///xMAAAABAAAAAAAAAP/////0////GAAAAAEAAAABAAAA//////P///8VAAAAAQAAAAEAAAD/////6P///xYAAAABAAAAAQAAAP/////y////FwAAAAEAAAABAAAA//////T///8cAAAAAQAAAAIAAAD/////8////xkAAAABAAAAAgAAAP/////o////GgAAAAEAAAACAAAA//////L///8bAAAAAQAAAAIAAAD/////CAAAAE5vcm1hbAAFBgAAABAAAAAAAAAA/////0AAAAAAAAAAHQAAAEhlYWRpbmcAAAAAAOBzQQYAAHsF0HNBBmxpdEhlYWRlHgAAAEZvb3RpbmcA4HB9BQAAAABgdH0FwB19BTEAAABgBAAAHwAAAFNlbGVjdGVkAAAAAGEAAAAwdH0FEHR9BUAAAAAxAAAAIAAAAENhcHRpb24A8GZ8BdBmfAWwZnwFYGB8BUBgfAUgYHwFIQAAAEhpZ2hsaWdodFJvdwDxfAXg8HwFwPB8BaDwfAWA8HwFIgAAAEV2ZW5Sb3cAkKt8BXCrfAVQq3wFsOp8BRCcfAXg9XwFIwAAAE9kZFJvdwAFEAF9BeAAfQWAAH0FUAB9BbBufQWAbn0FJAAAAAsAAAD//wAAAwAAAAAAAAALAAAAAAAAAAMAAAAAAAAACwAAAAAAAAADAAAAAAAAAAMAAAAAAAAAAwAAAAAAAAADAAAAAAAAAAMAAAAAAAAAAwAAAAAAAAADAAAAAAAAAAMAAAAAAAAAHgAAAAEAAAAAAAAAHgAAAAEAAAAAAAAAHgAAAAEAAAAAAAAAAwAAAAAAAAALAAAAAAAAAAMAAAAAAAAABAAAAAAAAAADAAAA6AMAAAsAAAD//wAACwAAAAAAAAADAAAAAQAAAAMAAAAAAAAAAwAAAAAAAAADAAAAAAAAAAMAAAAAAAAAAwAAAMgAAAADAAAAAAAAAAMAAADAwMAAAwAAAJDQAwA6AAAAAAAAAAkAAABUREJHcmlkMQACAAAADAAAAEFsbG93QWRkTmV3AC8AAAAMAAAAQWxsb3dBcnJvd3MAAQAAAAwAAABBbGxvd0RlbGV0ZQAEAAAADAAAAEFsbG93VXBkYXRlAL0AAAAOAAAAQW5pbWF0ZVdpbmRvdwDAAAAAEwAAAEFuaW1hdGVXaW5kb3dDbG9zZQC+AAAAFwAAAEFuaW1hdGVXaW5kb3dEaXJlY3Rpb24AvwAAABIAAABBbmltYXRlV2luZG93VGltZQD4/f//CwAAAEFwcGVhcmFuY2UACP7//wwAAABCb3JkZXJTdHlsZQD6/f//CAAAAENhcHRpb24AYAAAAAkAAABDZWxsVGlwcwB+AAAADgAAAENlbGxUaXBzRGVsYXkAfQAAAA4AAABDZWxsVGlwc1dpZHRoAI8AAAAOAAAAQ29sdW1uRm9vdGVycwAHAAAADgAAAENvbHVtbkhlYWRlcnMACAAAAAgAAABDb2x1bW5zACUAAAAJAAAARGF0YU1vZGUAxAAAABIAAABEZWFkQXJlYUJhY2tDb2xvcgAKAAAADAAAAERlZkNvbFdpZHRoAFAAAAANAAAARWRpdERyb3BEb3duAF8AAAAKAAAARW1wdHlSb3dzAP79//8IAAAARW5hYmxlZAAwAAAADwAAAEV4cG9zZUNlbGxNb2RlAJEAAAAKAAAARm9vdExpbmVzAAwAAAAKAAAASGVhZExpbmVzAJgAAAALAAAASW5zZXJ0TW9kZQBdAAAADwAAAExheW91dEZpbGVOYW1lAFwAAAALAAAATGF5b3V0TmFtZQCxAAAACgAAAExheW91dFVSTABKAAAADgAAAE1hcnF1ZWVVbmlxdWUAzgAAAAgAAABNYXhSb3dzAKMAAAAKAAAATW91c2VJY29uAKQAAAANAAAATW91c2VQb2ludGVyAIQAAAAMAAAATXVsdGlTZWxlY3QAYQAAAA4AAABNdWx0aXBsZUxpbmVzAJ8AAAAMAAAAT0xFRHJhZ01vZGUAoAAAAAwAAABPTEVEcm9wTW9kZQCXAAAAEQAAAFBpY3R1cmVBZGRuZXdSb3cAlQAAABIAAABQaWN0dXJlQ3VycmVudFJvdwCzAAAAEQAAAFBpY3R1cmVGb290ZXJSb3cAsgAAABEAAABQaWN0dXJlSGVhZGVyUm93AJYAAAATAAAAUGljdHVyZU1vZGlmaWVkUm93ALAAAAATAAAAUGljdHVyZVN0YW5kYXJkUm93ALQAAAALAAAAUHJpbnRJbmZvcwAPAAAAEAAAAFJvd0RpdmlkZXJTdHlsZQAjAAAABwAAAFNwbGl0cwAxAAAAEAAAAFRhYkFjcm9zc1NwbGl0cwAyAAAACgAAAFRhYkFjdGlvbgCZAAAAFwAAAFRyYW5zcGFyZW50Um93UGljdHVyZXMAMwAAABAAAABXcmFwQ2VsbFBvaW50ZXIA0wcAAAkAAABfRXh0ZW50WADUBwAACQAAAF9FeHRlbnRZAAACAAAMAAAAX0xheW91dFR5cGUAEAAAAAsAAABfUm93SGVpZ2h0AAECAAALAAAAX1N0eWxlRGVmcwAEAgAAFgAAAF9XYXNQZXJzaXN0ZWRBc1BpeGVscwA=" width="750" height="<%=GridHeight%>" VIEWASTEXT></object>
+		</td>
+	</tr>
+</table>
+
+ <table border="0" width="755" id=TABLE1 cellspacing=0 cellpadding=1>
+  <tr> 
+    <td valign="top" width="110">
+      <form id="frmSelectAll" name="frmSelectAll">
+       <table border=0>
+			<tr>
+				<td>
+					<table bgcolor=#006400 border=1 cellpadding=0 bordercolordark=Silver>
+						<tr>
+							<td bordercolor=black>
+								<input style="FONT-SIZE: xx-small" type="checkbox" name="chkSelectAll" id="chkSelectAll" value="ON" onClick="chkSelectAll_onclick()">
+							</td>
+						</tr>
+					</table>
+				</td>
+				<td>
+					<p class="SelectFont">Select All</p>
+				</td>
+			</tr>
+		</table> 
+         <!--
+<A href="Switchboard3.asp"><font face="Tahoma" size="2">Back to Home Page</font></A>
+<input style="FONT-SIZE: xx-small" type="checkbox" name="chkUnSelectAll" id="chkUnSelectAll" value="ON" onclick="chkUnSelectAll_onclick()"><font face="Tahoma" size="2">UnSelect All</font>        
+--> 
+      </form>
+    </td>
+	
+	<td>
+	<table border=1 cellpadding=2 cellspacing=0 height=83>
+	<tr>
+	<td>
+	<table border=0 cellpadding=1 cellspacing=0>
+	<tr valign="top">
+	
+		<td valign="top">
+			<table cellpadding=0 cellspacing=0 align="right" valign="top" border=0>
+			    <form action=reportlocation.asp?type=loc&mode=v method=post id=frmViewLocation name=frmViewLocation>
+				<input type=hidden id=txtLetterHead name=txtLetterHead value="No">
+				<tr>
+					<td>
+						<input type=HIDDEN id=txtViewLocationList name=txtViewLocationList>
+						<input id=cmdViewLocation style="FONT-SIZE: xx-small; COLOR: #007500; WIDTH: 150px; HEIGHT: 23px" type=button value="View Selected Location(s)" name=cmdViewLocation width="200" onClick="javascript:actionMode('v')">
+					</td>
+				</tr>
+				<tr>
+					<td>
+				        <input type=HIDDEN id=txtPrintLocationList name=txtPrintLocationList>
+				        <input id=cmdPrintLocation style="FONT-SIZE: xx-small; COLOR: #007500; WIDTH: 150px; HEIGHT: 23px" type=button value="Print Selected Location(s)" name=cmdPrintLocation width="200">
+				    </td>
+				</tr>
+				<tr>
+					<td>
+				        <input type=HIDDEN id=txtEmailLocationList name=txtEmailLocationList>
+				        <input id=cmdEmailLocation style="FONT-SIZE: xx-small; COLOR: #007500; WIDTH: 150px; HEIGHT: 23px" type=button value="Email Selected Location(s)" name=cmdEmailLocation width="200" onClick="javascript:actionMode('e')">
+				    </td>
+				</tr>
+				</form>
+			</table>
+	</td>
+    <td valign="top" align="center">
+		<img style="margin-left: 5px" src="images/PrintDetail.gif" width="55">
+	</td>
+	
+	</tr>
+	</table>
+	</td>
+	</tr>
+	</table>
+	</td>
+	
+	</td>
+    <td valign="top"> 
+    
+   	<td>
+	<table border=1 cellpadding=2 cellspacing=0 height=83>
+	<tr>
+	<td valign="top">
+	<table border=0 cellpadding=1 cellspacing=0>
+	<tr valign="top">
+
+    <td> 
+		<table border=0 cellpadding=0 cellspacing=0 align="right" valign="top">
+			<form action=reportlocationsummary.asp?type=loc&mode=v method=post id=frmViewSummary name=frmViewSummary>
+			<input type=hidden id=txtLetterHead name=txtLetterHead value="No">
+			<tr>
+				<td>
+					<input type=HIDDEN id=txtViewSummaryList name=txtViewSummaryList>
+					<input id=cmdViewSummary style="FONT-SIZE: xx-small; COLOR: #000080; WIDTH: 150px; HEIGHT: 23px" type=button value="View Location Summary" name=cmdViewSummary width="200">
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<input type=HIDDEN id=txtPrintSummaryList name=txtPrintSummaryList>
+					<input id=cmdPrintSummary style="FONT-SIZE: xx-small; COLOR: #000080; WIDTH: 150px; HEIGHT: 23px" type=button value="Print Location Summary" name=cmdPrintSummary width="200">
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<input type=HIDDEN id=txtEmailSummaryList name=txtEmailSummaryList>
+					<input id=cmdEmailSummary style="FONT-SIZE: xx-small; COLOR: #000080; WIDTH: 150px; HEIGHT: 23px" type=button value="Email Location Summary" name=cmdEmailSummary width="200">
+				</td>
+			</tr>
+			</form>
+		</table>
+    </td>
+    
+    <td valign="top" align="left">
+		<img style="margin-left: 5px" src="images/PrintSummary.gif" width="78" height="54">
+	</td>
+    
+	</tr>
+	</table>
+	</td>
+	</tr>
+	</table>
+	</td>
+    
+    <td valign="Middle" width="160" align="center"> 
+      <form id=frmLetterHead name=frmLetterHead>
+        <p class="SelectFont">Letterhead:<br>
+        <select class="SelectFont" size="1" name="cboLetterhead">
+          <option value="Yes">Yes</option>
+          <option selected value="No">No</option>
+        </select>
+        </p>
+      </form>
+    </td>
+    <td valign=Bottom align="right">
+      <!--form id=frmMainMenu name=frmMainMenu-->
+			<input id=cmdMainMenu style="FONT-SIZE: xx-small; COLOR: #007500; WIDTH: 80px; HEIGHT: 23px" type=button value="Main Menu" name=cmdMainMenu>
+      <!--/form-->
+    </td>
+    </td>
+  </tr>
+</table>
+
+<iframe name=ifPrintReport id=ifPrintReport style="HEIGHT:0; WIDTH:0; VISIBILITY: hidden">
+</iframe>
+
+
+</body>
+<script LANGUAGE="vbscript">
+<!--
+	'Turn off Record Selectors
+	window.TDBGrid1.RecordSelectors = False
+    Set C = window.TDBGrid1.Columns.Add (2)
+    C.Visible = True
+    
+    Set C = window.TDBGrid1.Columns.Add(3)
+    C.Visible = True
+
+    Set C = window.TDBGrid1.Columns.Add (4)
+    C.Visible = False 'True  Do not show State Column!
+    
+    Set C = window.TDBGrid1.Columns.Add(5)
+    C.Visible = True
+    Set C = window.TDBGrid1.Columns.Add (6)
+    C.Visible = True
+    
+    Set C = window.TDBGrid1.Columns.Add(7)
+    C.Visible = True
+    Set C = window.TDBGrid1.Columns.Add (8)
+    C.Visible = True
+    
+    Set C = window.TDBGrid1.Columns.Add(9)
+    C.Visible = True
+    
+    Set C = window.TDBGrid1.Columns.Add (10)
+    C.Visible = True
+    
+
+    Set C = window.TDBGrid1.Columns.Add (11)
+    C.Visible = True
+
+
+    Set col0 = window.TDBGrid1.Columns(0)
+    Set col1 = window.TDBGrid1.Columns(1)
+    Set Col2 = window.TDBGrid1.Columns(2)
+    Set Col3 = window.TDBGrid1.Columns(3)
+    Set Col4 = window.TDBGrid1.Columns(4)
+    Set Col5 = window.TDBGrid1.Columns(5)
+    Set Col6 = window.TDBGrid1.Columns(6)
+    Set Col7 = window.TDBGrid1.Columns(7)
+    Set Col8 = window.TDBGrid1.Columns(8)
+    Set Col9 = window.TDBGrid1.Columns(9)
+    Set Col10 = window.TDBGrid1.Columns(10)
+    Set Col11 = window.TDBGrid1.Columns(11)
+    
+
+    ' Set column heading text
+
+    'Formatting
+    'Selected
+    Col0.Caption = "" '"Selected"
+    Col0.Width = 20 '25 Reducing the checkbox col width
+    
+    Col1.Caption = "Name"
+    Col2.Caption = "Address"
+    Col3.Caption = "City"
+    Col4.Caption = "State"
+    Col5.Caption = "Phone"
+    Col6.Caption = "Map"
+    Col7.Caption = "Coupon"
+    Col8.Caption = "Menu"
+    Col9.Caption = "Web"
+    Col10.Caption = "Stars" ' "" '"Stars" Hotel Rating
+    Col11.Caption = "Price" ' "" '"Cost" Price Rating
+
+	'Formatting
+	'Selected
+    window.TDBGrid1.Columns(0).Locked = False
+    window.TDBGrid1.Columns(0).Width = 20 '25 Reducing the checkbox col width
+    window.TDBGrid1.Columns(0).Caption = "" '"Selected"
+    window.TDBGrid1.Columns(0).Backcolor = 4223793
+    
+    
+    window.TDBGrid1.Columns(1).Locked = True
+    window.TDBGrid1.Columns(1).Width = 210 '167 '125 increased to utilize extra space at the end of the grid...
+    window.TDBGrid1.Columns(1).Caption = "Name"
+    window.TDBGrid1.Columns(1).Forecolor = 16711680 ' Added 05/6/01
+    window.TDBGrid1.Columns(1).Backcolor = 15333886
+    window.TDBGrid1.Columns(1).font.underline = true
+
+    window.TDBGrid1.Columns(2).Locked = True
+    window.TDBGrid1.Columns(2).Width = 150
+    window.TDBGrid1.Columns(2).Caption = "Address"
+    window.TDBGrid1.Columns(2).Backcolor = 15333886
+
+    window.TDBGrid1.Columns(3).Locked = True
+    window.TDBGrid1.Columns(3).Width = 80
+    window.TDBGrid1.Columns(3).Caption = "City"
+    window.TDBGrid1.Columns(3).Backcolor = 14612478
+
+    window.TDBGrid1.Columns(4).Locked = True
+    window.TDBGrid1.Columns(4).Width = 37.5
+    window.TDBGrid1.Columns(4).Caption = "State"
+    window.TDBGrid1.Columns(4).Backcolor = 14612478
+    
+    window.TDBGrid1.Columns(5).Locked = True
+    window.TDBGrid1.Columns(5).Width = 85
+    window.TDBGrid1.Columns(5).Caption = "Phone"
+    window.TDBGrid1.Columns(5).Backcolor = 14087422
+
+    window.TDBGrid1.Columns(6).Locked = True
+    window.TDBGrid1.Columns(6).Width = 37.5
+    window.TDBGrid1.Columns(6).Caption = "Map"
+    window.TDBGrid1.Columns(6).Backcolor = 13628158
+    window.TDBGrid1.Columns(6).Autosize
+
+    window.TDBGrid1.Columns(7).Locked = True
+    window.TDBGrid1.Columns(7).Width = 37.5
+    window.TDBGrid1.Columns(7).Caption = "Cpn"
+    window.TDBGrid1.Columns(7).Backcolor = 12709629
+    window.TDBGrid1.Columns(7).Autosize
+
+    window.TDBGrid1.Columns(8).Locked = True
+    window.TDBGrid1.Columns(8).Width = 37.5
+    window.TDBGrid1.Columns(8).Caption = "Menu"
+    window.TDBGrid1.Columns(8).Forecolor = 16711680 ' Added 04/21/01
+    window.TDBGrid1.Columns(8).Backcolor = 10741500
+    window.TDBGrid1.Columns(8).font.underline = true
+    window.TDBGrid1.Columns(8).Autosize
+
+    window.TDBGrid1.Columns(9).Locked = True
+    window.TDBGrid1.Columns(9).Width = 37.5
+    window.TDBGrid1.Columns(9).Caption = "Web"
+    window.TDBGrid1.Columns(9).Forecolor = 16711680 ' Added 04/21/01
+    window.TDBGrid1.Columns(9).Backcolor = 9822715
+    window.TDBGrid1.Columns(9).font.underline = true
+    window.TDBGrid1.Columns(9).Autosize
+
+    window.TDBGrid1.Columns(10).Locked = True
+    window.TDBGrid1.Columns(10).Width = 37.5
+    window.TDBGrid1.Columns(10).Caption = "Stars" ' "" '"Stars" Hotel Rating
+    window.TDBGrid1.Columns(10).Backcolor = 8641786
+
+    window.TDBGrid1.Columns(11).Locked = True
+    window.TDBGrid1.Columns(11).Width = 37.5
+    window.TDBGrid1.Columns(11).Caption = "Price" ' "" '"Cost" Price Rating
+    window.TDBGrid1.Columns(11).Backcolor = 6870521
+
+    window.TDBGrid1.ApproxCount = MaxRow
+	
+	'Set rowheight taller
+	window.TDBGrid1.RowHeight = 0
+	window.TDBGrid1.RowHeight = 1.5 * TDBGrid1.RowHeight
+
+Private Function MakeBookmark(Index)
+
+' This support function is used only by the remaining
+
+' support functions. It is not used directly by the
+
+' unbound events. It is a good idea to create a
+
+' MakeBookmark function such that all bookmarks can be
+
+' created in the same way. Thus the method by which
+
+' bookmarks are created is consistent and easy to
+
+' modify. This function creates a bookmark when given
+
+' an array row index.
+
+' Since we have data stored in an array, we will just
+
+' use the array index as our bookmark. We will convert
+
+' it to a string first, using the CStr function.
+
+    MakeBookmark = CStr(Index)
+
+End Function
+
+Private Function IndexFromBookmark(Bookmark, ReadPriorRows)
+
+' This support function is used only by the remaining
+
+' support functions. It is not used directly by the
+
+' unbound events.
+
+    
+
+' This function is the inverse of MakeBookmark. Given
+
+' a bookmark, IndexFromBookmark returns the row index
+
+' that the given bookmark refers to. If the given
+
+' bookmark is Null, then it refers to BOF or EOF. In
+
+' such a case, we need to use ReadPriorRows to
+
+' distinguish between the two. If ReadPriorRows = True,
+
+' the grid is requesting rows before the current
+
+' location, so we must be at EOF, because no rows exist
+
+' before BOF. Conversely, if ReadPriorRows = False,
+
+' we must be at BOF.
+
+    
+
+    Dim Index
+
+      
+
+    If IsNull(Bookmark) Then
+
+        If ReadPriorRows Then
+
+            ' Bookmark refers to EOF. Since (MaxRow - 1)
+
+            ' is the index of the last record, we can use
+
+            ' an index of (MaxRow) to represent EOF.
+
+            IndexFromBookmark = MaxRow
+
+        Else
+
+            ' Bookmark refers to BOF. Since 0 is the
+
+            ' index of the first record, we can use an
+
+            ' index of -1 to represent BOF.
+
+            IndexFromBookmark = -1
+
+        End If
+
+    Else
+
+        ' Convert string to long integer
+
+        Index = clng(Bookmark)
+
+        
+
+        ' Check to see if the row index is valid:
+
+        '  (0 <= Index < MaxRow).
+
+        ' If not, set it to a large negative number to
+
+        ' indicate that the bookmark is invalid.
+
+        If Index < 0 Or Index >= MaxRow Then Index = -9999
+
+        IndexFromBookmark = Index
+
+    End If
+
+End Function
+
+Private Function GetRelativeBookmark(Bookmark, RelPos)
+
+' GetRelativeBookmark is used to get a bookmark for a
+
+' row that is a given number of rows away from the given
+
+' row. This specific example will always use either -1
+
+' or +1 for a relative position, since we will always be
+
+' retrieving either the row previous to the current one,
+
+' or the row following the current one.
+
+' IndexFromBookmark expects a Bookmark and a Boolean
+
+' value: this Boolean value is True if the next row to
+
+' read is before the current one [in this case,
+
+' (RelPos < 0) is True], or False if the next row to
+
+' read is after the current one [(RelPos < 0) is False].
+
+' This is necessary to distinguish between BOF and EOF
+
+' in the IndexFromBookmark function if our bookmark is
+
+' Null. Once we get the correct row index from
+
+' IndexFromBookmark, we simply add RelPos to it to get
+
+' the desired row index and create a bookmark using
+
+' that index.
+
+    Dim Index
+
+    
+
+    Index = IndexFromBookmark(Bookmark, RelPos < 0) + RelPos
+
+    If Index < 0 Or Index >= MaxRow Then
+
+        ' Index refers to a row before the first or after
+
+        ' the last, so just return Null.
+
+        GetRelativeBookmark = Null
+
+    Else
+
+        GetRelativeBookmark = MakeBookmark(Index)
+
+    End If
+
+End Function
+
+function GetMenuWebData(Col, Index)
+	Select Case Col
+		Case 8
+			if (GridArray(Col, Index) <> "") then
+				GetMenuWebData = "Menu"
+			else
+				GetMenuWebData = ""
+			end if
+	
+		Case 9
+			if (GridArray(Col, Index) <> "") then
+				GetMenuWebData = "Web"
+			else
+				GetMenuWebData = ""
+			end if
+	
+		Case Else
+			GetMenuWebData = GridArray(Col, Index)
+	End Select
+End Function
+
+
+Private Function GetUserData(Bookmark, Col)
+
+' In this example, GetUserData is called by
+
+' UnboundReadData to ask the user what data should be
+
+' displayed in a specific cell in the grid. The grid
+
+' row the cell is in is the one referred to by the
+
+' Bookmark parameter, and the column it is in it given
+
+' by the Col parameter. GetUserData is called on a
+
+' cell-by-cell basis.
+
+    Dim Index
+
+' Figure out which row the bookmark refers to
+
+    Index = IndexFromBookmark(Bookmark, False)
+
+    
+
+    If Index < 0 Or Index >= MaxRow Or Col < 0 Or Col >= MaxCol Then
+
+        ' Cell position is invalid, so just return null
+
+        ' to indicate failure
+
+        GetUserData = Null
+
+    Else
+		'GetUserData = GridArray(Col, Index)
+		GetUserData = GetMenuWebData(Col, Index)
+
+    End If
+
+End Function
+
+cboCat_onchange
+
+-->
+</script>
+
+</html>
+
+<SCRIPT LANGUAGE="javascript">
+	function actionMode( mode )
+		{
+		switch( mode )
+			{
+			case "v": {
+				document.frmViewLocation.action = "reportlocation.asp?type=loc&mode=v";
+				break; }
+			case "p": {
+				document.frmViewLocation.action = "reportlocation.asp?type=loc&mode=p";
+				break; }
+			case "e": {
+				/* document.frmViewLocation.target = "_new" */
+				document.frmViewLocation.action = "reportlocation.asp?type=loc&mode=e";
+				break; }
+			}
+		}
+</SCRIPT>

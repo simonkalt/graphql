@@ -1,0 +1,15 @@
+Structure for database : BELLCO.DBF
+Number of data records : 16735
+Date of last update    : 10/10/95
+Field  Field Name  Type       Width    Dec
+    1  BELLCONUM   Character      6 
+    2  F           Character      1 
+    3  NAME        Character     30 
+    4  SIZE        Character      5 
+    5  FORM        Character      2 
+    6  NCD         Character     11 
+    7  FILLER      Character      1 
+** Total **                      57
+
+
+

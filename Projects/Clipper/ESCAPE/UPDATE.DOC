@@ -1,0 +1,49 @@
+
+
+                 ษออออออออออออออออออออออออออออออออออออป
+                 บ                                    บ
+		 บ	  Escape version 2.04	      บ
+                 บ         Update Information         บ
+                 บ         as of July 9, 1991         บ
+                 บ                                    บ
+                 ศออออออออออออออออออออออออออออออออออออผ
+
+
+2.0 -	* * * Initial Release * * *
+
+
+2.01 -	10/27/90
+
+        Fixed problem with soft font selection, caused by stroke width
+        range of -7 to +7
+
+
+2.02 - 12/24/90
+
+        Added Library for Clipper 5.0.  This library does not use the
+        public variables as documented in the manual.
+
+
+2.03 - 02/02/91
+
+        Fixed bug in HPTMARGIN().  PC LOAD EXEC problem eliminated by
+        explicitly setting VMI to 8/48" before selecting page length.
+        Orientation command no longer sent on every font change, only on
+        page setup.  Fixed problem of soft font selection in the 5.0
+        library which occured if more than one soft font was used.
+
+
+2.04 - 03/09/91
+
+        Fixed bug which caused Escape to incorrectly calculate width of
+        fixed space soft fonts.
+
+2.05 - 07/08/91
+
+        This update reflects an update to the ESCAPE.FNT file to support
+        the LaserJet Series III and the Pacific Data Products 25 in One!
+        cartridge.  HPERR.PRG added as sample error trap and other
+        examples modified accordingly.
+
+
+

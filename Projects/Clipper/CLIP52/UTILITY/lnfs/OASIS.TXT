@@ -1,0 +1,49 @@
+
+                                   The Oasis
+
+ 
+                           http://www.iag.net/~philb/
+                         ftp://ftp.iag.net/pub/clipper
+                          Maintained by: philb@iag.net
+
+
+The ftp site for CA-Clipper programmers who need to satisfy their thirst!
+
+We would like to hear from you if any .ZIP you download from us has
+problems, or if any of our downloads are not of GOOD quality.
+
+-------------------------------------------------------------------------------
+
+This file, and thousands of other files, are brought to you by my
+sponser, Communications Horizons. Without Neil Weicher's help, I would
+have to abandon The Oasis.
+
+In March of 1997 alone, over 4 gigabytes of files were transferred from
+The Oasis to CA-Clipper programmers all over the world.
+
+All of you who have used The Oasis owe a big thank you to Neil Weicher
+at Communications Horizons.
+
+Without arguing about price, he wanted to know how he could help Clipper
+programmers to continue using the language, and now he supports most of
+the huge amount of ftp traffic on The Oasis.
+
+Of course, the nicest thank you that Neil could possibly get would be
+for you to purchase his outstanding CA-Clipper networking library.
+
+Not willing to be left behind, Neil has added many new functions which
+directly address networking under Windows '95 and Windows NT.
+
+When you need to address a printer queue, the functionality is there to
+support multiple operating systems. I assume you have all figured out
+that Windows is here to stay, so we must be able to deal with it
+intelligently, without sacrificing Novell Netware compatibility.
+
+NetLib is the most intelligent, multi O/S, richly functional network
+library in the world today.
+
+Say thanks to Neil, while you are ordering...
+
+Phil Barnett
+Web Designer of The Oasis.
+

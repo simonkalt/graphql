@@ -1,0 +1,496 @@
+<% 
+
+If Trim(rs("ServerPath"))="" Or IsNull(rs("ServerPath")) Then
+	 strPathName=PathName(Request.ServerVariables("PATH_TRANSLATED"))
+Else
+	strPathName=rs("ServerPath")
+End If
+If Trim(rs("DomainURL"))="" Or IsNull(rs("DomainURL")) Then
+	 strDomainURL="http://" & Request.ServerVariables("SERVER_NAME") & getFilePath() & "banman.asp"
+Else
+	 strDomainURL=rs("DomainURL")
+End If
+'Domain URL
+If Trim(rs("DomainURL"))="" Or IsNull(rs("DomainURL")) Then
+	 strDomainURL="http://" & Request.ServerVariables("SERVER_NAME") & getFilePath() & "banman.asp"
+Else
+	 strDomainURL=rs("DomainURL")
+End If
+'Mail Server
+If Trim(rs("MailServer"))="" Or IsNull(rs("MailServer")) Then
+	 strMailServer=Request.ServerVariables("SERVER_NAME")
+Else
+	 strMailServer=rs("MailServer")
+End If
+
+%>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>User Name</title>
+<meta name="GENERATOR" content="Microsoft FrontPage 4.0">
+</head>
+
+<body>
+
+<!--webbot BOT="GeneratedScript" PREVIEW=" " startspan --><script Language="JavaScript"><!--
+function FrontPage_Form1_Validator(theForm)
+{
+
+  if (theForm.UniqueClickHour.value == "")
+  {
+    alert("Please enter a value for the \"Require Unique Click Every X Hours\" field.");
+    theForm.UniqueClickHour.focus();
+    return (false);
+  }
+
+  if (theForm.UniqueClickHour.value.length < 1)
+  {
+    alert("Please enter at least 1 characters in the \"Require Unique Click Every X Hours\" field.");
+    theForm.UniqueClickHour.focus();
+    return (false);
+  }
+
+  var checkOK = "0123456789-,";
+  var checkStr = theForm.UniqueClickHour.value;
+  var allValid = true;
+  var decPoints = 0;
+  var allNum = "";
+  for (i = 0;  i < checkStr.length;  i++)
+  {
+    ch = checkStr.charAt(i);
+    for (j = 0;  j < checkOK.length;  j++)
+      if (ch == checkOK.charAt(j))
+        break;
+    if (j == checkOK.length)
+    {
+      allValid = false;
+      break;
+    }
+    if (ch != ",")
+      allNum += ch;
+  }
+  if (!allValid)
+  {
+    alert("Please enter only digit characters in the \"Require Unique Click Every X Hours\" field.");
+    theForm.UniqueClickHour.focus();
+    return (false);
+  }
+
+  var checkOK = "0123456789-,";
+  var checkStr = theForm.ZoneAverageDays.value;
+  var allValid = true;
+  var decPoints = 0;
+  var allNum = "";
+  for (i = 0;  i < checkStr.length;  i++)
+  {
+    ch = checkStr.charAt(i);
+    for (j = 0;  j < checkOK.length;  j++)
+      if (ch == checkOK.charAt(j))
+        break;
+    if (j == checkOK.length)
+    {
+      allValid = false;
+      break;
+    }
+    if (ch != ",")
+      allNum += ch;
+  }
+  if (!allValid)
+  {
+    alert("Please enter only digit characters in the \"Zone Average Days\" field.");
+    theForm.ZoneAverageDays.focus();
+    return (false);
+  }
+
+  var chkVal = allNum;
+  var prsVal = parseInt(allNum);
+  if (chkVal != "" && !(prsVal >= "1"))
+  {
+    alert("Please enter a value greater than or equal to \"1\" in the \"Zone Average Days\" field.");
+    theForm.ZoneAverageDays.focus();
+    return (false);
+  }
+
+  var checkOK = "0123456789-,";
+  var checkStr = theForm.StandardCampaignLength.value;
+  var allValid = true;
+  var decPoints = 0;
+  var allNum = "";
+  for (i = 0;  i < checkStr.length;  i++)
+  {
+    ch = checkStr.charAt(i);
+    for (j = 0;  j < checkOK.length;  j++)
+      if (ch == checkOK.charAt(j))
+        break;
+    if (j == checkOK.length)
+    {
+      allValid = false;
+      break;
+    }
+    if (ch != ",")
+      allNum += ch;
+  }
+  if (!allValid)
+  {
+    alert("Please enter only digit characters in the \"Average Campaign Length\" field.");
+    theForm.StandardCampaignLength.focus();
+    return (false);
+  }
+
+  var chkVal = allNum;
+  var prsVal = parseInt(allNum);
+  if (chkVal != "" && !(prsVal >= "1"))
+  {
+    alert("Please enter a value greater than or equal to \"1\" in the \"Average Campaign Length\" field.");
+    theForm.StandardCampaignLength.focus();
+    return (false);
+  }
+
+  var checkOK = "0123456789-,";
+  var checkStr = theForm.GuaranteedImpressionsPerSlot.value;
+  var allValid = true;
+  var decPoints = 0;
+  var allNum = "";
+  for (i = 0;  i < checkStr.length;  i++)
+  {
+    ch = checkStr.charAt(i);
+    for (j = 0;  j < checkOK.length;  j++)
+      if (ch == checkOK.charAt(j))
+        break;
+    if (j == checkOK.length)
+    {
+      allValid = false;
+      break;
+    }
+    if (ch != ",")
+      allNum += ch;
+  }
+  if (!allValid)
+  {
+    alert("Please enter only digit characters in the \"Guaranteed Impressions/Slot\" field.");
+    theForm.GuaranteedImpressionsPerSlot.focus();
+    return (false);
+  }
+
+  var chkVal = allNum;
+  var prsVal = parseInt(allNum);
+  if (chkVal != "" && !(prsVal >= "0"))
+  {
+    alert("Please enter a value greater than or equal to \"0\" in the \"Guaranteed Impressions/Slot\" field.");
+    theForm.GuaranteedImpressionsPerSlot.focus();
+    return (false);
+  }
+  return (true);
+}
+//--></script><!--webbot BOT="GeneratedScript" endspan --><form method="POST" action="updateadmin.asp" align="center" onsubmit="return FrontPage_Form1_Validator(this)" name="FrontPage_Form1">
+  <div align="center">
+    <center>
+    <table border="0" cellpadding="0" cellspacing="0" width="574" bordercolor="#000000">
+      <tr>
+        <td>
+          <p align="center"><a href="help/preferences.htm" target="_blank"><img border="0" src="images/AdministratorInformation.gif" WIDTH="590" HEIGHT="30"></a></td>
+      </tr>
+      </table>
+      <table border="1" cellpadding="10" cellspacing="0" width="590" background="images/tableback.gif" bordercolor="#003063">
+
+      <tr>
+        <td>
+          <div align="center">
+            <center>
+            <table border="0" cellpadding="5" cellspacing="0" width="480" background="images/tableback.gif">
+              <tr>
+                <td align="right" width="168"><font face="Arial" size="3"><img src="images/required2.gif" WIDTH="14" HEIGHT="12"></font><strong><font face="Arial" size="2">User Name:</font></strong></td>
+                <td width="288"><input type="text" name="UserName" size="20" value="<%=rs("AdministratorName")%>"></td>
+              </tr>
+              <tr>
+                <td align="right" width="168"><font face="Arial" size="3"><img src="images/required2.gif" WIDTH="14" HEIGHT="12"></font><strong><font face="Arial" size="2">Password:</font></strong></td>
+                <td width="288"><input type="password" name="Password1" size="20" value="<%=rs("AdministratorPassword")%>"></td>
+              </tr>
+              <tr>
+                <td align="right" width="168"><font face="Arial" size="3"><img src="images/required2.gif" WIDTH="14" HEIGHT="12"></font><strong><font face="Arial" size="2">Verify Password:</font></strong></td>
+                <td width="288"><input type="password" name="Password2" size="20" value="<%=rs("AdministratorPassword")%>"></td>
+              </tr>
+              <tr>
+                <td align="right" width="168"><font face="Arial" size="3"><img src="images/required2.gif" WIDTH="14" HEIGHT="12"></font><strong><font face="Arial" size="2">Email:</font></strong></td>
+                <td width="288"><input type="text" name="AdministratorEmail" size="40" value="<%=rs("AdministratorEmail")%>"></td>
+              </tr>
+              <tr>
+                <td align="right" width="168"><font face="Arial" size="2"><strong>Email
+        Daily Report:</strong></font></td>
+                <td width="288" valign="top" align="left"><input type="checkbox" name="DailyReport" value="-1" <%If rs("DailyReport")=True Then%>checked<%End If%>>&nbsp;&nbsp;</td>
+              </tr>
+              <tr>
+                <td align="right" width="168"><font face="Arial" size="2"><strong>Email
+                  Weekly Report (Sun-Sat):</strong></font></td>
+                <td width="288" valign="top" align="left"><input type="checkbox" name="WeeklyReport" value="-1" <%If rs("WeeklyReport")=True Then%>checked<%End If%>>&nbsp;&nbsp;</td>
+              </tr>
+            </table>
+            </center>
+          </div>
+        </td>
+      </tr>
+    </table>
+    </center>
+  </div>
+  <p>&nbsp;</p>
+  <div align="center">
+    <center>
+    <table border="0" cellpadding="0" cellspacing="0" width="574" bordercolor="#000000">
+      <tr>
+        <td>
+          <p align="center"><a href="help/preferences.htm#serverinformation" target="_blank"><img border="0" src="images/ServerInformation.gif" WIDTH="590" HEIGHT="30"></a></td>
+      </tr>
+      </table>
+    </center>
+  </div>
+  <div align="center">
+    <center>
+      <table border="1" cellpadding="10" cellspacing="0" width="590" background="images/tableback.gif" bordercolor="#003063">
+      <tr>
+        <td>
+          <div align="center">
+            <center>
+            <table border="0" cellpadding="5" cellspacing="0" width="550" background="images/tableback.gif">
+              <tr>
+                <td align="right" width="191"><font face="Arial" size="3"><img src="images/required2.gif" WIDTH="14" HEIGHT="12"></font><font face="Arial" size="2"><strong>Full Domain URL for
+                  Ban Man Pro Main Program:</strong></font></td>
+                <td width="343"><input type="text" name="DomainURL" size="40" value="<%=strDomainURL%>">&nbsp;</td>
+              </tr>
+              <tr>
+                <td align="right" width="191"><font face="Arial" size="3"><img src="images/required2.gif" WIDTH="14" HEIGHT="12"></font><strong><font face="Arial" size="2">Server Path:</font></strong></td>
+                <td width="343"><input type="text" name="ServerPath" size="40" value="<%=strPathName%>">&nbsp;</td>
+              </tr>
+              <tr>
+                <td align="right" width="191"><font face="Arial" size="3"><img src="images/required2.gif" WIDTH="14" HEIGHT="12"></font><strong><font face="Arial" size="2">Email Program:</font></strong></td>
+                <td width="343"><select name="MailProgram" size="1">
+        <option <% if rs("MailProgram") = "CDONTS Mail" then %>selected<% end if %> value="CDONTS Mail">CDONTS Mail </option>
+        <option <% if rs("MailProgram") = "Persits ASP EMail" then %>selected<% end if %> value="Persits ASP EMail">Persits ASP EMail </option>
+        <option <% if rs("MailProgram") = "ASP Mail" then %>selected<% end if %> value="ASP Mail">ASP Mail </option>
+        <option <% if rs("MailProgram") = "OCXQMail" then %>selected<% end if %> value="OCXQMail">OCXQMail </option>
+        <option <% if rs("MailProgram") = "OCX Mail" then %>selected<% end if %> value="OCX Mail">OCX Mail </option>
+        <option <% if rs("MailProgram") = "J Mail" then %>selected<% end if %> value="J Mail">J Mail </option>
+        <option <% if rs("MailProgram") = "Bamboo Mail" then %>selected<% end if %> value="Bamboo Mail">Bamboo Mail </option>
+        <option <% if rs("MailProgram") = "Simple Mail" then %>selected<% end if %> value="Simple Mail">Simple Mail </option>
+        <option <% if rs("MailProgram") = "AB Mail" then %>selected<% end if %> value="AB Mail">AB Mail </option>
+      </select> <font face="Arial" size="2"><a href="mailtest.asp">Perform Test</a>&nbsp;</font></td>
+              </tr>
+              <tr>
+                <td align="right" width="191"><font face="Arial" size="3"><img src="images/required2.gif" WIDTH="14" HEIGHT="12"></font><font face="Arial" size="2"><strong>Mail Server:</strong></font></td>
+                <td width="343"><input type="text" name="MailServer" size="40" value="<%=strMailServer%>">&nbsp;</td>
+              </tr>
+            </table>
+            </center>
+          </div>
+        </td>
+      </tr>
+    </table>
+    </center>
+  </div>
+  <p>&nbsp;</p>
+  <div align="center">
+    <center>
+    <table border="0" cellpadding="0" cellspacing="0" width="574" bordercolor="#000000">
+      <tr>
+        <td>
+          <p align="center"><a href="help/preferences.htm#otherinformation" target="_blank"><img border="0" src="images/OtherInformation.gif" WIDTH="590" HEIGHT="30"></a></td>
+      </tr>
+      </table>
+    </center>
+  </div>
+  <div align="center">
+    <center>
+      <table border="1" cellpadding="10" cellspacing="0" width="590" background="images/tableback.gif" bordercolor="#003063">
+      <tr>
+        <td>
+          <div align="center">
+            <center>
+            <table border="0" cellpadding="3" cellspacing="0" width="550" background="images/tableback.gif">
+              <tr>
+                <td align="right" width="309"><font face="Arial" size="2"><strong>Notify
+      Me Each Time A Campaign Expires:</strong></font></td>
+                <td width="225"><input type="checkbox" name="EmailWhenCampaignExpires" value="-1" <%If rs("EmailWhenCampaignExpires")=True Then%>checked<%End If%>>&nbsp;</td>
+              </tr>
+              <tr>
+                <td align="right" width="309"><font face="Arial" size="2"><strong>Defeat
+                  Cache:</strong></font></td>
+                <td width="225"><input type="checkbox" name="CacheBustingMode" value="-1" <%If rs("CacheBustingMode")=True Then%>checked<%End If%>>&nbsp;</td>
+              </tr>
+              <tr>
+                <td align="right" width="309"><font face="Arial" size="2"><strong>Require
+                  Unique Clicks Every X Hours:</strong></font></td>
+                <td width="225"><!--webbot bot="Validation" S-Display-Name="Require Unique Click Every X Hours" S-Data-Type="Integer" S-Number-Separators="," B-Value-Required="TRUE" I-Minimum-Length="1" --><input type="text" name="UniqueClickHour" size="4" value="<%=rs("UniqueClickHour")%>">&nbsp;</td>
+              </tr>
+              <tr>
+                <td align="right" width="309"><font face="Arial" size="2"><strong>Date
+                  Format:</strong></font></td>
+                <td width="225"><select size="1" name="DateFormat">
+                    <option value="MM/DD/YYYY" <%If rs("DateFormat")="MM/DD/YYYY" Then%>selected<%End If%>>MM/DD/YYYY</option>
+                    <option value="DD/MM/YYYY" <%If rs("DateFormat")="DD/MM/YYYY" Then%>selected<%End If%>>DD/MM/YYYY</option>
+                  </select></td>
+              </tr>
+              <tr>
+                <td align="right" width="309"><font face="Arial" size="2"><strong>Base
+                  Smoothing algorithm on X minutes of stats:</strong></font></td>
+                <td width="225"><select size="1" name="SmoothingMinutes">
+                    <option value="5" <%If Clng(rs("SmoothingMinutes"))=5 Then%>selected<%End If%>>5</option>
+                    <option value="10" <%If Clng(rs("SmoothingMinutes"))=10 Then%>selected<%End If%>>10</option>
+                    <option value="15" <%If Clng(rs("SmoothingMinutes"))=15 Then%>selected<%End If%>>15</option>
+                    <option value="20" <%If Clng(rs("SmoothingMinutes"))=20 Then%>selected<%End If%>>20</option>
+                    <option value="30" <%If Clng(rs("SmoothingMinutes"))=30 Then%>selected<%End If%>>30</option>
+                    <option value="60" <%If Clng(rs("SmoothingMinutes"))=60 Then%>selected<%End If%>>60</option>
+                  </select> <font face="Arial" size="2">minutes</font></td>
+              </tr>
+              <tr>
+                <td align="right" width="309"><font face="Arial" size="2"><strong>Number
+                  of Days to base Zone Averages On:&nbsp;</strong></font></td>
+                <td width="225"><!--webbot bot="Validation" S-Display-Name="Zone Average Days" S-Data-Type="Integer" S-Number-Separators="," S-Validation-Constraint="Greater than or equal to" S-Validation-Value="1" --><input type="text" name="ZoneAverageDays" size="4" value="<%=rs("ZoneAverageDays")%>">
+                  <font face="Arial" size="2">days</font></td>
+              </tr>
+              <tr>
+                <td align="right" width="309"><font face="Arial" size="2"><strong>Default
+                  Campaign Length:&nbsp;</strong></font></td>
+                <td width="225"><!--webbot bot="Validation" S-Display-Name="Average Campaign Length" S-Data-Type="Integer" S-Number-Separators="," S-Validation-Constraint="Greater than or equal to" S-Validation-Value="1" --><input type="text" name="StandardCampaignLength" size="4" value="<%=rs("StandardCampaignLength")%>">
+                  <font face="Arial" size="2">days</font></td>
+              </tr>
+              <tr>
+                <td align="right" width="309"><font face="Arial" size="2"><strong>Use
+                  Slot Option:&nbsp;</strong></font></td>
+                <td width="225"><input type="checkbox" name="SlotOption" value="-1" <%If rs("SlotOption")=True Then%>checked<%End If%>>
+                  <font face="Arial" size="2"><a href="http://www.banmanpro.com/support/slotoption.asp">Please
+                  Read First</a></font></td>
+              </tr>
+              <tr>
+                <td align="right" width="309"><font face="Arial" size="2"><strong>Guaranteed
+                  Impression/Slot:&nbsp;</strong></font></td>
+                <td width="225"><!--webbot bot="Validation" S-Display-Name="Guaranteed Impressions/Slot" S-Data-Type="Integer" S-Number-Separators="," S-Validation-Constraint="Greater than or equal to" S-Validation-Value="0" --><input type="text" name="GuaranteedImpressionsPerSlot" size="6" value="<%=rs("GuaranteedImpressionsPerSlot")%>">
+                  <font face="Arial" size="1">(slot option only)</font></td>
+              </tr>
+            </table>
+            </center>
+          </div>
+        </td>
+      </tr>
+    </table>
+    </center>
+  </div>
+          <p align="center">&nbsp;
+  <div align="center">
+    <center>
+    <table border="0" cellpadding="0" cellspacing="0" width="574" bordercolor="#000000">
+      <tr>
+        <td>
+          <p align="center"><a href="help/preferences.htm#advertiserreports" target="_blank"><img border="0" src="images/ReportsAvailableToAdvertisers.gif" width="590" height="30"></a></td>
+      </tr>
+      </table>
+    </center>
+  </div>
+  <div align="center">
+    <center>
+      <table border="1" cellpadding="10" cellspacing="0" width="590" background="images/tableback.gif" bordercolor="#003063">
+      <tr>
+        <td>
+          <div align="center">
+            <center>
+            <table border="0" cellpadding="3" cellspacing="0" width="550" background="images/tableback.gif">
+              <tr>
+                <td align="right" width="309"><font face="Arial" size="2"><strong>Summary
+                  By Day:</strong></font></td>
+                <td width="225"><input type="checkbox" name="Reports_SummaryByDay" value="-1" <%If rsReports("Reports_SummaryByDay")=True Then%>checked<%End If%>>&nbsp;</td>
+              </tr>
+              <tr>
+                <td align="right" width="309"><font face="Arial" size="2"><strong>Summary
+                  By Banner:</strong></font></td>
+                <td width="225"><input type="checkbox" name="Reports_SummaryByBanner" value="-1" <%If rsReports("Reports_SummaryByBanner")=True Then%>checked<%End If%>></td>
+              </tr>
+              <tr>
+                <td align="right" width="309"><font face="Arial" size="2"><strong>Summary
+                  By Banner By Day:</strong></font></td>
+                <td width="225"><input type="checkbox" name="Reports_SummaryByBannerByDay" value="-1" <%If rsReports("Reports_SummaryByBannerByDay")=True Then%>checked<%End If%>></td>
+              </tr>
+              <tr>
+                <td align="right" width="309"><font face="Arial" size="2"><strong>Summary
+                  By Zone:</strong></font></td>
+                <td width="225"><input type="checkbox" name="Reports_SummaryByZone" value="-1" <%If rsReports("Reports_SummaryByZone")=True Then%>checked<%End If%>></td>
+              </tr>
+              <tr>
+                <td align="right" width="309"><font face="Arial" size="2"><strong>Summary
+                  By Zone By Day:</strong></font></td>
+                <td width="225"><input type="checkbox" name="Reports_SummaryByZoneByDay" value="-1" <%If rsReports("Reports_SummaryByZoneByDay")=True Then%>checked<%End If%>></td>
+              </tr>
+              <tr>
+                <td align="right" width="309"><font face="Arial" size="2"><strong>Click
+                  Detail:&nbsp;</strong></font></td>
+                <td width="225"><input type="checkbox" name="Reports_ClickDetail" value="-1" <%If rsReports("Reports_ClickDetail")=True Then%>checked<%End If%>></td>
+              </tr>
+            </table>
+            </center>
+          </div>
+        </td>
+      </tr>
+    </table>
+    </center>
+  </div>
+  <p align="center"> <input type="submit" value="Update Preferences" name="B1">&nbsp;&nbsp;</p>
+  <p align="center"> <font face="Arial" size="3"><img src="images/required2.gif" WIDTH="14" HEIGHT="12">Indicates Required Fields</font></p>
+</form>
+<img src="http://38.204.29.183/blank.gif?DomainURL=<%=strDomainURL%>&amp;Pid=BanManProSQL2&amp;oID=22794" width="1" height="1" border="0">
+</body>
+</html>
+<%
+
+Function PathName(strPathAndFile)
+
+    '********************************************************************************************
+    'Returns just the path name without the file name.
+    '********************************************************************************************
+
+    '********************************************************************************************
+    'declarations
+    '********************************************************************************************
+     
+    Dim intI		             'counter variable
+    Dim intInputLength 		     'length of the input path and file name
+    Dim intEndPath                   'left position of filename in input path & file name
+    
+    '********************************************************************************************
+    'code
+    '********************************************************************************************
+    
+    intInputLength = Len(strPathAndFile)
+    
+    For intI = intInputLength To 1 Step -1
+        If Mid(strPathAndFile, intI, 1) = "\" Then
+            intEndPath = intI
+            Exit For
+        End If
+    Next
+    
+    PathName = Left(strPathAndFile, intEndPath)
+
+End Function
+%>
+<%
+Function getFilePath()
+	Dim lsPath, arPath
+
+	' Obtain the virtual file path. The SCRIPT_NAME
+	' item in the ServerVariables collection in the
+	' Request object has the complete virtual file path
+	lsPath = Request.ServerVariables("SCRIPT_NAME")
+                           
+	' Split the path along the /s. This creates an
+	' This creates an one-dimensional array 
+	arPath = Split(lsPath, "/")
+
+	' Set the last item in the array to blank string
+	' (The last item actually is the file name)
+	arPath(UBound(arPath,1)) = ""
+	
+	' Join the items in the array. This will
+	' give you the virtual path of the file
+	GetFilePath = Join(arPath, "/")
+End Function
+
+%>

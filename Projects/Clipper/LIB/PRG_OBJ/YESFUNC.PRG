@@ -1,0 +1,28 @@
+#include "box.ch"
+
+FUNCTION YES( cSTRING )
+  LOCAL ELEFT, ERIGHT, lRET_VAL, YESMENU, scrScreen
+
+  ELEFT  := ((79-LEN( cSTRING ))/2)-1
+  ERIGHT := 80-ELEFT
+
+  scrScreen := SaveScreen( 9,ELEFT,16,ERIGHT+1 )
+  Box3d( 9,ELEFT,15,ERIGHT,B_SINGLE+" " )
+
+  @ 11,ELEFT+2 SAY cSTRING
+
+  YESPOS := (LEN( cSTRING )-5)/2
+  @ 13,ELEFT+YESPOS   PROMPT "Yes"
+  @ 13,ELEFT+YESPOS+5 PROMPT "No"
+  MENU TO YESMENU
+
+  IF YESMENU == 1
+    lRET_VAL := .T.
+  ELSE
+    lRET_VAL := .F.
+  ENDIF
+  RestScreen( 9,ELEFT,16,ERIGHT+1,scrScreen )
+
+RETURN lRET_VAL
+
+

@@ -1,0 +1,107 @@
+Active DateTime v1.2
+Copyright (C) 2002 Active Up SPRL
+
+1. Source Code License
+
+You can register the software to acces to the royalty free source code version
+of the software. This registration will allow you to use the source code
+conforming our source code license agreement below.
+
+a. License Grant. Active Up SPRL grants the Licensee, and the Licensee hereby
+accepts, a non-exclusive, perpetual license to install, use, modify, prepare
+derivative works, incorporate into other computer software, and distribute the
+version noted above of the computer software program noted above, in binary and
+source code format, or any derivative work thereof, together with any associated
+media, printed materials, and on-line or electronic documentation (if any)
+provided by Active Up SPRL (collectively, the "Software"), subject to the
+following terms and conditions: (i) any distribution of the Software shall bind
+the receiver to the terms and conditions of this Agreement; (ii) any distribution
+of the Software in modified form shall clearly state that the Software has been
+modified from the version originally obtained from Active Up SPRL. 
+
+b.  Copyright; Retention of rights. The above license grant is conditioned on the
+following: (i) the Licensee must reproduce all copyright notices and other
+proprietary notices on any copies of the Software and the Licensee must not remove
+such notices; (ii) in the event the Licensee compile the Software, the Licensee
+will include the copyright notice with the binary in such a manner as to allow it
+to be easily viewable; (iii) if the Licensee incorporate the Software into other
+code, the Licensee must provide notice that the code contains the Software and
+include a copy of the copyright notices and other proprietary notices. All copies
+of the Software shall be subject to the terms of this Agreement. (a) the Licensee
+hereby acknowledges that the Software is protected by Belgian copyright law and
+international treaty provisions; (b) Active Up SPRL, and its licensors (if any),
+hereby reserve all rights in the Software which are not explicitly granted to the
+Licensee herein; (c) without limiting the generality of the foregoing, Active Up
+SPRL and its licensors retain all title, copyright, and other proprietary
+interests in the Software and any copies thereof, and the Licensee do not acquire
+any rights, express or implied, in the Software, other than those specifically
+set forth in this Agreement. 
+
+c. Confidentiality
+
+The Licensee acknowledges and agrees that the Software constitutes the
+confidential and proprietary trade secrets of Active Up SPRL and its suppliers,
+and that Licensee’s protection thereof is essential to this Agreement and a
+condition of Licensee’s use and possession of the Software. The Licensee shall
+retain in strict confidence any and all elements of the Software and use the
+Software only as expressly licensed herein. The Licensee agrees that it will under
+no circumstances distribute or in any way disseminate or disclose the Software to
+third parties.
+
+2. Warranty disclaimer
+
+THE SOFTWARE IS SUPPLIED "AS IS" WITHOUT WARRANTY OF ANY KIND. ACTIVE UP SPRL, ITS
+LICENSORS AND THEIR EMPLOYEES: (1) DISCLAIM ANY WARRANTIES, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO ANY IMPLIED WARRANTIES OR MERCHANTABILITY, FITNESS FOR
+A PARTICULAR PURPOSE, TITLE OR NON-INFRINGEMENT, (2) DO NOT ASSUME ANY LEGAL
+LIABILITY OR RESPONSIBILITY FOR THE ACCURACY, COMPLETENESS, OR USEFULNESS OF THE
+SOFTWARE, (3) DO NOT REPRESENT THAT USE OF THE SOFTWARE WOULD NOT INFRINGE
+PRIVATELY OWNED RIGHTS, (4) DO NOT WARRANT THAT THE SOFTWARE WILL FUNCTION
+UNINTERRUPTED, THAT IT IS ERROR-FREE OR THAT ANY ERRORS WILL BE CORRECTED. 
+
+3. Limitation of liability
+
+IN NO EVENT WILL ACTIVE UP SPRL OR ITS LICENSORS BE LIABLE FOR ANY INDIRECT,
+INCIDENTAL, CONSEQUENTIAL, SPECIAL OR PUNITIVE DAMAGES OF ANY KIND OR NATURE,
+ INCLUDING BUT NOT LIMITED TO LOSS OF PROFITS OR LOSS OF DATA, FOR ANY REASON
+WHATSOEVER, WHETHER SUCH LIABILITY IS ASSERTED ON THE BASIS OF CONTRACT, TORT
+(INCLUDING NEGLIGENCE OR STRICT LIABILITY), OR OTHERWISE, EVEN IF ACTIVE UP SPRL
+HAS BEEN WARNED OF THE POSSIBILIITY OF SUCH LOSS OR DAMAGES. IN NO EVENT SHALL
+ACTIVE UP SPRL 'S LIABILITY FOR DAMAGES ARISING FROM OR IN CONNECTION WITH THIS
+AGREEMENT EXCEED THE AMOUNT PAID BY YOU FOR THE SOFTWARE. 
+
+4. Indemnity
+
+The Licensee shall indemnify, defend, and hold harmless Active Up SPRL, the
+Software developers, the Software sponsors, and their agents, officers, and employees,
+against any and all claims, suits, losses, damage, costs, fees, and expenses arising
+out of or in connection with this Agreement. The Licensee shall pay all costs incurred
+by Active Up SPRL in enforcing this provision, including reasonable attorney fees. 
+
+5. Term and termination
+
+The license granted to the Licensee under this Agreement will continue perpetually
+unless terminated by Active Up SPRL in accordance with this Agreement. If the Licensee
+breaches any term of this Agreement, and fails to cure such breach within thirty (30)
+days of the date of written notice, this Agreement shall immediately terminate. Upon
+such termination, the Licensee shall immediately cease using the Software, return to
+Active Up SPRL, or destroy, all copies of the Software, and provide Active Up SPRL
+with written certification of your compliance with the foregoing. Termination shall
+not relieve the Licensee from its obligations arising prior to such termination.
+Notwithstanding any provision of this Agreement to the contrary, Sections 1 through
+4 shall survive termination of this Agreement. 
+
+6. Export controls
+
+The Licensee shall observe all applicable Belgian and foreign laws and regulations
+(if any) with respect to the export, re-export, diversion or transfer of the Software,
+related technical data and direct products thereof, including, without limitation, the
+International Traffic in Arms Regulations (ITAR) and the Export Administration Regulations. 
+
+7. Applicable law - jurisdiction
+
+This license contract is governed exclusively by Belgian law. In the event of a dispute
+arising in relation to the conclusion, interpretation or execution hereof, the Belgian
+courts, and more specifically those of the judicial district of Liege shall have sole
+jurisdiction.
+

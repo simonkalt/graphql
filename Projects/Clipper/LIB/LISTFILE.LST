@@ -1,0 +1,9 @@
+Publics by module
+
+MESS    	size = 2163
+	FLASHING_B                        MESS
+	MESSAGE_BO                        REMOVE_MES
+
+SHADOW  	size = 554
+	BOX3D                             SHADOW
+	SHA_SHADOW                      

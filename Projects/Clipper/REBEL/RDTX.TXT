@@ -1,0 +1,20 @@
+                              DAVID GRANT, INC.
+                    Computer Consultants and Programmers
+                               (818) 501-2769
+
+
+
+                             Krelitz Industries
+                             File Upload Program
+                            ---------------------
+
+      Insert the upload program diskette supplied by Krelitz Industries
+      into drive "A:"; then press <CTRL><ALT><DEL>.  This will re-boot
+      your system and begin the upload process.
+
+
+      NOTE:  When upload is complete, remove the program diskette from
+      drive "A:" and re-boot your computer.
+
+                            ---------------------
+

@@ -1,0 +1,37 @@
+##############################################################################
+#
+#   This PEL contains the indentx function.  It acts as an auto-indent toggle 
+#   - the first call saves the auto-indent state (contained in the global 
+#   variable auto_indent_mode) and turns off auto-indent.  The second call 
+#   restores auto-indent to it's previous state.
+#
+#   The primary use of this function is part of the cut & paste feature of 
+#   Curtis Palm/SofSolution's "Expert Help Hypertext Search Engine (tm)".  
+#   For it to work, simply load EH with the -B3 switch.  Do not remap the F10 
+#   key from it's default (invoke_function).
+#
+#   To add this PEL to SAGEEDIT.AE simply load it into SAGE and do an Alt-F10 
+#   (compile_buffer).
+#
+#   Robert V. Hannah III
+#   5303 Aden Ct.
+#   Williamsburg, Va  23188
+#   CI$:  73307,47
+#
+##############################################################################
+
+local ai_state = -1
+
+function indentx( set )
+{
+        if ( ai_state == -1 )
+        {
+                ai_state = auto_indent_mode
+                toggle_auto_indent( 0 )
+        }
+        else
+        {
+                toggle_auto_indent( ai_state )
+                ai_state = -1
+        }
+}

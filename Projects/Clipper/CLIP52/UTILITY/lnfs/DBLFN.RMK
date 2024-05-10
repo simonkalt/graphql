@@ -1,0 +1,44 @@
+// To compile DBLFN.LIB you will need:
+//
+//    Microsoft MASM 5.1 (or compatible)
+//    Microsoft C 7.00 (8.00 should work too)
+//    Microsoft LIB.EXE (supplied with the above)
+//    Microsoft Socks(TM) (clean ones of course)
+//
+// I would hope that everything is pathed too, otherwise
+// this is going to be a very quick make time....
+
+// If you want to recompile for 286 processor, simply invoke RMAKE like this:
+//    RMAKE /dUSE286
+#ifdef USE286
+USE286_C=/G2
+USE286_ASM=/DUSE286 /la
+#else
+USE286_ASM=/la
+#endif
+
+.c.obj:
+ cl /Zi /c /AL /FPa /Zl /Gs /Oalte /Gt1 /DDGROUP $(USE286_C) $<
+
+.prg.obj:
+ clipper $< /m/n/w/b
+
+.asm.obj:
+ masm /Zi /Ml $(USE286_ASM) $<;
+
+test.obj:      test.prg
+
+direct.obj:    direct.c clipper.api
+lfn.obj:       lfn.c    clipper.api
+
+filesys.obj:   filesys.asm
+filesysl.obj:  filesysl.asm
+convert.obj:   convert.asm
+
+
+dblfn.lib: direct.obj lfn.obj filesys.obj filesysl.obj convert.obj
+ lib dblfn @dblfn.rsp
+
+
+test.exe: test.obj dblfn.lib
+ blinker fi test search dblfn bli exe ext search blxclp52 file mrdebug.lib map s,a
