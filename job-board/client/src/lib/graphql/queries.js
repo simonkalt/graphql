@@ -3,7 +3,16 @@ import { GraphQLClient, gql } from "graphql-request";
 const client = new GraphQLClient("http://localhost:9000/graphql");
 
 export async function getCompany(id) {
-  const query = gql``;
+  const query = gql`
+    query ExampleQuery {
+      jobs {
+        id
+      }
+      companies {
+        id
+      }
+    }
+  `;
 }
 
 export async function getJob(id) {
