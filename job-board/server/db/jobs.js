@@ -8,7 +8,7 @@ export async function getJobs() {
 }
 
 export async function getJobsByCompany(companyId) {
-  return (await getJobTable().select()).copyWithin({ companyId });
+  return await getJobTable().select().where({ companyId });
 }
 
 export async function getJob(id) {
