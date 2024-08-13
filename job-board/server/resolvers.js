@@ -30,9 +30,13 @@ export const resolvers = {
   },
 
   Mutation: {
-    createJob: (_root, { input: { title, description } }) => {
-      const companyId = "FjcJCHJALA4i"; // change when auth is used
-      return createJob({ companyId, title, description });
+    createJob: (_root, { input: { title, description } }, { user }) => {
+      // console.log("[createJob] context: ", auth);
+      if (!user) {
+        throw unauthorizedError("Missing Authentication");
+      }
+      console.log("[create job] user: ", user);
+      return createJob({ companyId: user.companyId, title, description });
     },
     deleteJob: (_root, { id }) => deleteJob(id),
     updateJob: (_root, { input: { id, title, description } }) => {
@@ -56,5 +60,11 @@ function toIsoDate(value) {
 function notFoundError(message) {
   return new GraphQLError(message, {
     extensions: { code: "NOT_FOUND" },
+  });
+}
+
+function unauthorizedError(message) {
+  return new GraphQLError(message, {
+    extensions: { code: "UNAUTHORIZED" },
   });
 }
