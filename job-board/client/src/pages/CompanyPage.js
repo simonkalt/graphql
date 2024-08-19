@@ -1,16 +1,13 @@
 import { useParams } from "react-router";
 // import { companies } from '../lib/fake-data';
-import { companyByIdQuery } from "../lib/graphql/queries";
 import JobList from "../components/JobList";
-import { useQuery } from "@apollo/client";
+import { useCompany } from "../lib/hooks";
 
 function CompanyPage() {
   const { companyId } = useParams();
-  const { data, error, loading } = useQuery(companyByIdQuery, {
-    variables: { id: companyId },
-  });
+  const { company, loading, error } = useCompany(companyId);
 
-  console.log("[CompanyPage]", { data, error, loading });
+  console.log("[CompanyPage]", { company, error, loading });
   if (loading) {
     return <h1>...Loading...</h1>;
   }
@@ -21,7 +18,6 @@ function CompanyPage() {
       </div>
     );
   }
-  const { company } = data;
 
   return (
     <div>
