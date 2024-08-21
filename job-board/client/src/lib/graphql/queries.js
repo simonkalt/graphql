@@ -1,16 +1,16 @@
-import { getAccessToken } from "../auth";
 import {
   ApolloClient,
   ApolloLink,
+  concat,
   createHttpLink,
   gql,
   InMemoryCache,
-  concat,
 } from "@apollo/client";
+import { getAccessToken } from "../auth";
 
 const httpLink = createHttpLink({ uri: "http://localhost:9000/graphql" });
+
 const authLink = new ApolloLink((operation, forward) => {
-  console.log("[authLink] operation: ", operation);
   const accessToken = getAccessToken();
   if (accessToken) {
     operation.setContext({
@@ -24,6 +24,19 @@ export const apolloClient = new ApolloClient({
   link: concat(authLink, httpLink),
   cache: new InMemoryCache(),
 });
+
+const jobDetailFragment = gql`
+  fragment JobDetail on Job {
+    id
+    date
+    title
+    company {
+      id
+      name
+    }
+    description
+  }
+`;
 
 export const companyByIdQuery = gql`
   query CompanyById($id: ID!) {
@@ -40,19 +53,6 @@ export const companyByIdQuery = gql`
   }
 `;
 
-const jobDetailFragment = gql`
-  fragment JobDetail on Job {
-    id
-    date
-    title
-    company {
-      id
-      name
-    }
-    description
-  }
-`;
-
 export const jobByIdQuery = gql`
   query JobById($id: ID!) {
     job(id: $id) {
@@ -63,15 +63,18 @@ export const jobByIdQuery = gql`
 `;
 
 export const jobsQuery = gql`
-  query Jobs {
-    jobs {
-      id
-      date
-      title
-      company {
+  query Jobs($limit: Int, $offset: Int) {
+    jobs(limit: $limit, offset: $offset) {
+      items {
         id
-        name
+        date
+        title
+        company {
+          id
+          name
+        }
       }
+      totalCount
     }
   }
 `;

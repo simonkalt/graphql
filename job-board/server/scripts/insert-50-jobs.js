@@ -1,7 +1,7 @@
 import { connection } from '../db/connection.js';
 
 const INTERVAL = 4 * 60 * 60 * 1000; // 4h
-const START_TIME = new Date('2023-01-31T09:00:00.000Z').getTime();
+const START_TIME = new Date('2024-01-31T09:00:00.000Z').getTime();
 
 await connection.table('job').truncate();
 
